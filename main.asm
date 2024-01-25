@@ -4,7 +4,7 @@ include main.inc
 .code
 start:
 	
-	mov byte ptr[szToDraw], 31
+	mov byte ptr[szToDraw], 35
 	fn crt_puts, "lmao test"
 
 	
