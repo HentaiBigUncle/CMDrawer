@@ -1,5 +1,15 @@
-**CMDrawer** - CMDrawer is a simple paint-like program working in windows cmd. You can export your masterpiece to .txt format (in future)!
+**CMDrawer** - CMDrawer is a simple paint-like console program made with Microsoft Assembly Language (masm32).
 
-Use your mouse (touchpad) to draw ascii-graphics in working area. You can change active symbol drawing and its color in Tools menu. 
+**Features:**
+
+**·** Use your mouse (touchpad) to draw ascii-graphics in working area. You can change active symbol for drawing and its color in Tools menu.
+
+**·** Export your drawing to .txt file (not done)
+
+**·** Clear working are if needed (not done)
+
+**·** Use some other tools (not done)
+
+
 
 
