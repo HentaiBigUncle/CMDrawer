@@ -14,13 +14,32 @@ includelib \masm32\lib\msvcrt.lib
 cout				proto	:DWORD
 lens				proto	:DWORD
 
-PutCursorToPos		proto 	xCor:WORD, yCor:WORD
+PutCursorToPos		proto 	:DWORD, :DWORD
+HideCursor			proto
 MenuCreate			proto
 Main				proto
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
 	VERTICAL_BORDER_LENGTH		equ		81
+	
+	; COLORS
+	cBlack				= 0
+	cBlue				= 1
+	cGreen				= 2
+	cCyan				= 3
+	cRed				= 4
+	cMagenta			= 5
+	cBrown				= 6
+	LightGray			= 7
+	DarkGray			= 8
+	LightBlue			= 9
+	LightGreen			= 10
+	LightCyan			= 11
+	LightRed			= 12
+	LightMagenta		= 13
+	cYellow				= 14
+	cWhite				= 15
 
 .data
 	ConsoleRecord			INPUT_RECORD	<>
@@ -29,10 +48,6 @@ Main				proto
 	;hOut		dd			0
 	;nRead		dd			0
 	
-	; SCREEN MANIPULATION
-	szHorizontalBorder		db			" ------------------------------------------------------------------------------------------------------------------------ ", 0
-	szVerticalBorder2		db			"|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, "|", 10, 0
-	szVerticalChr			db			"|", 0
 	szClear					db			"cls", 0
 	szTitle					db			"CMDrawer v0.2.", 0
 	; DRAWING
