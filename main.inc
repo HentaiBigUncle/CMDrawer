@@ -5,11 +5,15 @@ option casemap :none
 include \masm32\include\kernel32.inc	; Basement
 include \masm32\include\msvcrt.inc		; C-funcs (may be I will write mine instead)
 include \masm32\include\windows.inc		; API for console, etc
+include \masm32\include\winmm.inc
 
 include \masm32\macros\macros.asm
 
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\msvcrt.lib
+includelib \masm32\lib\winmm.lib
+
+
 
 cout				proto	:DWORD
 lens				proto	:DWORD
@@ -18,6 +22,8 @@ PutCursorToPos		proto 	:DWORD, :DWORD
 HideCursor			proto
 MenuCreate			proto
 Main				proto
+
+PlaySoundOnClick	proto	:DWORD
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
@@ -42,9 +48,17 @@ Main				proto
 	cWhite				= 15
 	
 ;	BRUSHES:
-	sharpBrush		equ		35
 	eraseBrush  	equ		32		; space
+	
+	exclBrush		equ		33
+	quoteBrush      equ		34
+	sharpBrush		equ		35
 	dollarBrush		equ		36
+	; percentBrush	equ		37
+	comAndBrush		equ		38
+	zeroQuoteBrush	equ		39
+	
+	
 	
 
 .data	
@@ -54,7 +68,10 @@ Main				proto
 	;hOut		dd			0
 	;nRead		dd			0
 	
-	szClear					db			"cls", 0
-	szTitle					db			"CMDrawer v0.2.", 0
+	szClear						db			"cls", 0
+	szTitle						db			"CMDrawer v0.2.", 0
+	szPlayOnClick				db			"Audio/Click.wav", 0
+	
+	
 	; DRAWING
 	szToDraw	db		    5	dup(0)

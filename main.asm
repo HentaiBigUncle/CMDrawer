@@ -58,18 +58,53 @@ Main proc	uses ebx ecx esi edi
 					invoke SetConsoleCursorPosition, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					fn crt_puts, offset szToDraw
 					
-				.elseif ax > WORKING_AREA_WIDTH+3 && ax < WORKING_AREA_WIDTH+9 && bx > 3 && bx < 7
-					mov byte ptr[szToDraw], sharpBrush
-					
-				.elseif ax > WORKING_AREA_WIDTH+10 && ax < WORKING_AREA_WIDTH+16 && bx > 3 && bx < 7
-					mov byte ptr[szToDraw], eraseBrush
-					
-				.elseif ax > WORKING_AREA_WIDTH+2 && ax < WORKING_AREA_WIDTH+18 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
+				.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 3 && bx < 6
 				
+					mov byte ptr[szToDraw], exclBrush
+					invoke PlaySoundOnClick, offset szPlayOnClick
+					
+				.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx > 3 && bx < 6
+				
+					mov byte ptr[szToDraw], quoteBrush
+					invoke PlaySoundOnClick, offset szPlayOnClick
+					
+				.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx > 3 && bx < 6
+				
+					mov byte ptr[szToDraw], sharpBrush
+					invoke PlaySoundOnClick, offset szPlayOnClick
+					
+				.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 3 && bx < 6
+				
+					mov byte ptr[szToDraw], dollarBrush
+					invoke PlaySoundOnClick, offset szPlayOnClick
+					
+				.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 3 && bx < 6
+				
+					mov byte ptr[szToDraw], comAndBrush	
+					invoke PlaySoundOnClick, offset szPlayOnClick
+					
+				.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 3 && bx < 6
+				
+					mov byte ptr[szToDraw], zeroQuoteBrush	
+					invoke PlaySoundOnClick, offset szPlayOnClick				
+					
+				; SPECIAL BUTTONS CHECKS
+					
+				.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+16 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
+				
+					invoke PlaySoundOnClick, offset szPlayOnClick
 					invoke MenuCreate
 					invoke SetConsoleMode, hIn, ENABLE_MOUSE_INPUT or ENABLE_EXTENDED_FLAGS or ENABLE_LINE_INPUT or ENABLE_ECHO_INPUT or ENABLE_PROCESSED_INPUT
 					
+				.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
+				
+					invoke PlaySoundOnClick, offset szPlayOnClick
 					
+				.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
+					
+					mov byte ptr[szToDraw], eraseBrush
+					invoke PlaySoundOnClick, offset szPlayOnClick
+						
 				.endif
 			.endif
 			
@@ -108,5 +143,11 @@ HideCursor proc uses ebx esi edi
 
 	Ret
 HideCursor endp
+
+PlaySoundOnClick proc uses ebx esi edi lpFile:DWORD
+
+	invoke PlaySound, lpFile, 0, SND_FILENAME or SND_ASYNC
+	Ret
+PlaySoundOnClick endp
 
 end start

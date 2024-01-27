@@ -1,10 +1,15 @@
 
-MenuCreate			proto
-SetWindowSize		proto		wt:DWORD, ht:DWORD
-LogoCreate			proto
-DrawAreaCreate		proto
-ToolsAreaCreate		proto
-CreateButton		proto		:BYTE, :DWORD, :DWORD
+
+SetWindowSize			proto		wt:DWORD, ht:DWORD
+
+MenuCreate				proto
+LogoCreate				proto
+DrawAreaCreate			proto
+ToolsAreaCreate			proto
+ExtraInfoAreaCreate		proto
+CreateButton			proto		:BYTE, :DWORD, :DWORD
+ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
+SpecialButtonsCreate	proto
 
 HorizontalBorderConstruct	proto	:DWORD, :DWORD, :DWORD
 VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
@@ -28,10 +33,14 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szProgramName			db			"CMD DRAWER aka CMDrawer", 0
 	szToolsArea				db			"TOOLS", 0
 	szClearButtonText		db			"Clear", 0
+	szExportButtonText		db			"Export", 0
+	szEraserButtonText      db			"Eraser", 0
+	szProgramVersion		db			"CMDrawer Version 1.2.0", 0
+	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
-	interfaceFontColor			dd			LightCyan
+	interfaceFontColor			dd			cYellow
 	interfaceBorderColor		dd			cWhite
 
 
@@ -45,6 +54,7 @@ MenuCreate proc	uses ecx esi edi
 	invoke LogoCreate
 	invoke DrawAreaCreate
 	invoke ToolsAreaCreate
+	invoke ExtraInfoAreaCreate
 	
 	Ret
 MenuCreate endp
@@ -113,22 +123,34 @@ ToolsAreaCreate proc uses ebx esi edi
 	invoke crt_printf, offset szToolsArea
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	
-	invoke CreateButton, sharpBrush, WORKING_AREA_WIDTH+3, 3
-	invoke CreateButton, eraseBrush, WORKING_AREA_WIDTH+10, 3
-	
-	
-	; Clear Button Creating
-	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+2, WORKING_AREA_HEIGHT-1
-	invoke HorizontalBorderConstruct, 15, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-2
-	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-1
-	invoke HorizontalBorderConstruct, 15, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT
-	
-	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
-	invoke PutCursorToPos, 128, WORKING_AREA_HEIGHT-1
-	invoke crt_printf, offset szClearButtonText
-	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	invoke ButtonCreate2, exclBrush, WORKING_AREA_WIDTH+3, 3
+	invoke ButtonCreate2, quoteBrush, WORKING_AREA_WIDTH+8, 3
+	invoke ButtonCreate2, sharpBrush, WORKING_AREA_WIDTH+13, 3
+	invoke ButtonCreate2, dollarBrush, WORKING_AREA_WIDTH+18, 3
+	invoke ButtonCreate2, comAndBrush, WORKING_AREA_WIDTH+23, 3
+	invoke ButtonCreate2, zeroQuoteBrush, WORKING_AREA_WIDTH+28, 3	
+
+	invoke SpecialButtonsCreate
 	Ret
 ToolsAreaCreate endp
+
+ExtraInfoAreaCreate proc uses ebx esi edi
+
+	LOCAL hOut: DWORD
+	invoke GetStdHandle, STD_OUTPUT_HANDLE
+	mov hOut, eax
+	
+	invoke SetConsoleTextAttribute, hOut, LightGray
+	
+	invoke PutCursorToPos, WORKING_AREA_WIDTH-7, WORKING_AREA_HEIGHT + 6
+	invoke crt_printf, offset szAuthor
+	
+	invoke PutCursorToPos, WORKING_AREA_WIDTH-7, WORKING_AREA_HEIGHT + 7
+	invoke crt_printf, offset szProgramVersion
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	Ret
+ExtraInfoAreaCreate endp
 
 HorizontalBorderConstruct proc uses ecx ebx esi edi count:DWORD, xCor: DWORD, yCor: DWORD
 	
@@ -185,3 +207,73 @@ CreateButton proc uses ebx ecx esi edi chr:BYTE, xCor:DWORD, yCor:DWORD
 
 	Ret
 CreateButton endp
+
+ButtonCreate2 proc uses ebx ecx esi edi chr:BYTE, xCor:DWORD, yCor:DWORD
+	
+	mov ebx, xCor
+	mov ecx, yCor
+	
+	inc ebx
+	invoke HorizontalBorderConstruct, 3, ebx, ecx
+	
+	add ecx, 2
+	invoke HorizontalBorderConstruct, 3, ebx, ecx
+	
+	dec ebx
+	dec ecx
+	invoke VerticalBorderConstruct, 1, ebx, ecx
+	
+	add ebx, 4
+	invoke VerticalBorderConstruct, 1, ebx, ecx
+	
+	sub ebx, 2
+	invoke PutCursorToPos, ebx, ecx
+	invoke crt_printf, addr chr
+
+	Ret
+ButtonCreate2 endp
+
+SpecialButtonsCreate proc uses ebx esi edi
+
+	LOCAL hOut: DWORD
+	
+	invoke GetStdHandle, STD_OUTPUT_HANDLE
+	mov hOut, eax
+	
+	; Clear Button Creating
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+2, WORKING_AREA_HEIGHT-1
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-2
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+16, WORKING_AREA_HEIGHT-1
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, 127, WORKING_AREA_HEIGHT-1
+	invoke crt_printf, offset szClearButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	
+	
+	; Export Button Creating
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-1
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-2
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+32, WORKING_AREA_HEIGHT-1
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, 143, WORKING_AREA_HEIGHT-1
+	invoke crt_printf, offset szExportButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	
+	; Eraser Button Creating
+	invoke VerticalBorderConstruct, 3, WORKING_AREA_WIDTH+2, WORKING_AREA_HEIGHT-6
+	invoke HorizontalBorderConstruct, 6, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-7
+	invoke VerticalBorderConstruct, 3, WORKING_AREA_WIDTH+9, WORKING_AREA_HEIGHT-6
+	invoke HorizontalBorderConstruct, 6, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-3
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-5
+	invoke crt_printf, offset szEraserButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	
+		
+	Ret
+SpecialButtonsCreate endp
