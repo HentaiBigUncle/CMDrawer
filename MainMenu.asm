@@ -9,7 +9,10 @@ CreateButton		proto		:BYTE, :DWORD, :DWORD
 HorizontalBorderConstruct	proto	:DWORD, :DWORD, :DWORD
 VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 
+
+
 .const
+
 	MAX_WIDTH				equ			150
 	MAX_HEIGHT				equ			50
 	
@@ -18,13 +21,21 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	
 	TOOLS_AREA_WIDTH		equ			32	; TOOLS_AREA_HEIGHT = WORKING_AREA_HEIGHT
 	
+	
+	
 .data
+
 	szProgramName			db			"CMD DRAWER aka CMDrawer", 0
 	szToolsArea				db			"TOOLS", 0
+	szClearButtonText		db			"Clear", 0
+	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
 	interfaceFontColor			dd			LightCyan
 	interfaceBorderColor		dd			cWhite
+
+
+
 
 .code
 MenuCreate proc	uses ecx esi edi
@@ -102,14 +113,20 @@ ToolsAreaCreate proc uses ebx esi edi
 	invoke crt_printf, offset szToolsArea
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	
-	;invoke HorizontalBorderConstruct, 4, WORKING_AREA_WIDTH+4, 4+3
-	;invoke HorizontalBorderConstruct, 4, WORKING_AREA_WIDTH+4, 3
-	;invoke VerticalBorderConstruct, 3, WORKING_AREA_WIDTH+3, 4
-	;invoke VerticalBorderConstruct, 3, WORKING_AREA_WIDTH+3+4+1, 4
-	
 	invoke CreateButton, sharpBrush, WORKING_AREA_WIDTH+3, 3
 	invoke CreateButton, eraseBrush, WORKING_AREA_WIDTH+10, 3
 	
+	
+	; Clear Button Creating
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+2, WORKING_AREA_HEIGHT-1
+	invoke HorizontalBorderConstruct, 15, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-2
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-1
+	invoke HorizontalBorderConstruct, 15, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, 128, WORKING_AREA_HEIGHT-1
+	invoke crt_printf, offset szClearButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	Ret
 ToolsAreaCreate endp
 

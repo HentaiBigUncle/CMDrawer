@@ -43,12 +43,6 @@ Main proc	uses ebx ecx esi edi
 		.endif
 		
 		.if eax == KEY_EVENT
-		
-			.if ConsoleRecord.KeyEvent.bKeyDown
-			
-				mov byte ptr[szToDraw], '1'
-				
-			.endif
 			
 		.elseif eax == MOUSE_EVENT
 		
@@ -69,6 +63,12 @@ Main proc	uses ebx ecx esi edi
 					
 				.elseif ax > WORKING_AREA_WIDTH+10 && ax < WORKING_AREA_WIDTH+16 && bx > 3 && bx < 7
 					mov byte ptr[szToDraw], eraseBrush
+					
+				.elseif ax > WORKING_AREA_WIDTH+2 && ax < WORKING_AREA_WIDTH+18 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
+				
+					invoke MenuCreate
+					invoke SetConsoleMode, hIn, ENABLE_MOUSE_INPUT or ENABLE_EXTENDED_FLAGS or ENABLE_LINE_INPUT or ENABLE_ECHO_INPUT or ENABLE_PROCESSED_INPUT
+					
 					
 				.endif
 			.endif
