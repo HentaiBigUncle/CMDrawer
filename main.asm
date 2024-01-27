@@ -64,6 +64,12 @@ Main proc	uses ebx ecx esi edi
 					invoke SetConsoleCursorPosition, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					fn crt_puts, offset szToDraw
 					
+				.elseif ax > WORKING_AREA_WIDTH+3 && ax < WORKING_AREA_WIDTH+9 && bx > 3 && bx < 7
+					mov byte ptr[szToDraw], sharpBrush
+					
+				.elseif ax > WORKING_AREA_WIDTH+10 && ax < WORKING_AREA_WIDTH+16 && bx > 3 && bx < 7
+					mov byte ptr[szToDraw], eraseBrush
+					
 				.endif
 			.endif
 			

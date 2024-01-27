@@ -40,8 +40,14 @@ Main				proto
 	LightMagenta		= 13
 	cYellow				= 14
 	cWhite				= 15
+	
+;	BRUSHES:
+	sharpBrush		equ		35
+	eraseBrush  	equ		32		; space
+	dollarBrush		equ		36
+	
 
-.data
+.data	
 	ConsoleRecord			INPUT_RECORD	<>
 
 	;hIn			dd			0
