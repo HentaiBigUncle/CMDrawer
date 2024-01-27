@@ -4,7 +4,7 @@ include MainMenu.asm
 .code
 start:
 	
-	fn SetConsoleTitle, "CMDrawer v1.0.0"
+	fn SetConsoleTitle, offset szProgramVersion
 	
 	invoke Main
 	
