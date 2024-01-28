@@ -4,12 +4,13 @@ include MainMenu.asm
 .code
 start:
 	
-	fn SetConsoleTitle, offset szProgramVersion
+	invoke SetConsoleTitle, offset szProgramVersion
+	
+	invoke SetWindowSize, MAX_WIDTH, MAX_HEIGHT
 	
 	invoke Main
 	
 	invoke ExitProcess, 0
-	fn crt_system, "pause"
 	
 Main proc	uses ebx ecx esi edi
 	
@@ -25,10 +26,12 @@ Main proc	uses ebx ecx esi edi
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
 	mov hOut, eax
 	
+	invoke GetConsoleWindow
+	invoke ShowScrollBar, eax, SB_BOTH, FALSE
+	invoke HideCursor
 	
 	invoke MenuCreate
 	
-	invoke HideCursor
 	invoke SetConsoleMode, hIn, ENABLE_MOUSE_INPUT or ENABLE_EXTENDED_FLAGS or ENABLE_LINE_INPUT or ENABLE_ECHO_INPUT or ENABLE_PROCESSED_INPUT
 	
 	_DOLOOP:
@@ -57,6 +60,7 @@ Main proc	uses ebx ecx esi edi
 					
 					invoke SetConsoleCursorPosition, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					fn crt_puts, offset szToDraw
+					;invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					
 				.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 3 && bx < 6
 				
@@ -75,37 +79,49 @@ Main proc	uses ebx ecx esi edi
 					
 				.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 3 && bx < 6
 				
-					mov byte ptr[szToDraw], dollarBrush
 					invoke PlaySoundOnClick, offset szPlayOnClick
+					mov byte ptr[szToDraw], dollarBrush
 					
 				.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 3 && bx < 6
 				
-					mov byte ptr[szToDraw], comAndBrush	
 					invoke PlaySoundOnClick, offset szPlayOnClick
+					mov byte ptr[szToDraw], comAndBrush	
 					
 				.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 3 && bx < 6
 				
+					invoke PlaySoundOnClick, offset szPlayOnClick
 					mov byte ptr[szToDraw], zeroQuoteBrush	
-					invoke PlaySoundOnClick, offset szPlayOnClick				
+									
 					
 				; SPECIAL BUTTONS CHECKS
-					
+				
+				; CLEAR	
 				.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+16 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
 				
 					invoke PlaySoundOnClick, offset szPlayOnClick
 					invoke MenuCreate
 					invoke SetConsoleMode, hIn, ENABLE_MOUSE_INPUT or ENABLE_EXTENDED_FLAGS or ENABLE_LINE_INPUT or ENABLE_ECHO_INPUT or ENABLE_PROCESSED_INPUT
 					
+				; EXPORT
 				.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
 				
 					invoke PlaySoundOnClick, offset szPlayOnClick
-					
+				
+				; IMPORT	
+				.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
+				
+					invoke PlaySoundOnClick, offset szPlayOnClick
+				
+				; ERASER	
 				.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
 					
 					mov byte ptr[szToDraw], eraseBrush
 					invoke PlaySoundOnClick, offset szPlayOnClick
 						
 				.endif
+				
+				;		invoke Sleep, densityBrush  Idea for regulation of brushes' density
+				
 			.endif
 			
 		.endif
@@ -144,10 +160,80 @@ HideCursor proc uses ebx esi edi
 	Ret
 HideCursor endp
 
-PlaySoundOnClick proc uses ebx esi edi lpFile:DWORD
+PlaySoundOnClick proc uses ecx esi edi lpFile:DWORD
 
 	invoke PlaySound, lpFile, 0, SND_FILENAME or SND_ASYNC
 	Ret
 PlaySoundOnClick endp
+
+
+ImportActionProc proc uses ecx esi edi
+
+
+
+	Ret
+ImportActionProc endp
+
+ExportActionProc proc uses ecx esi edi
+
+
+
+	Ret
+ExportActionProc endp
+
+SetWindowSize proc uses ebx esi edi wd:DWORD, ht:DWORD
+	
+	LOCAL hOut: DWORD
+	
+	invoke GetStdHandle, STD_OUTPUT_HANDLE
+	mov hOut, eax
+	
+	mov ebx, ht
+	shl ebx, 16
+	or ebx, wd
+	
+	invoke GetConsoleWindow
+	invoke ShowWindow, eax,SW_MAXIMIZE
+	
+	invoke SetConsoleScreenBufferSize, hOut, ebx
+	invoke SetConsoleWindowInfo, hOut, 1, offset srect
+	
+	Ret
+SetWindowSize endp
+
+DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+	
+	LOCAL xCor: DWORD
+	LOCAL yCor: DWORD
+	
+	mov eax, dwCoord
+	mov ecx, dwCoord
+	shl eax, 16
+	shr eax, 16
+	shr ecx, 16
+	
+	mov xCor, eax
+	mov yCor, ecx
+	
+	lea esi, szBrushBuffer
+	mov ebx, 0
+	
+	.while ebx < drawSize
+	
+		invoke lstrcat, offset szBrushBuffer, offset szToDraw
+		inc ebx
+		
+	.endw
+	
+	mov ebx, 0
+	.while ebx < drawSize
+	
+		invoke crt_puts, offset szBrushBuffer
+		inc ebx
+	
+	.endw
+
+	Ret
+DrawCell endp
 
 end start

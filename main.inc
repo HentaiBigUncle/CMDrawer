@@ -3,27 +3,33 @@
 option casemap :none
 
 include \masm32\include\kernel32.inc	; Basement
-include \masm32\include\msvcrt.inc		; C-funcs (may be I will write mine instead)
 include \masm32\include\windows.inc		; API for console, etc
+include \masm32\include\msvcrt.inc		; C-funcs (may be I will write mine instead)
 include \masm32\include\winmm.inc
+include \masm32\include\user32.inc
 
 include \masm32\macros\macros.asm
 
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\msvcrt.lib
 includelib \masm32\lib\winmm.lib
+includelib \masm32\lib\user32.lib
 
 
-
-cout				proto	:DWORD
-lens				proto	:DWORD
+DrawCell				proto   :DWORD, :DWORD
 
 PutCursorToPos		proto 	:DWORD, :DWORD
 HideCursor			proto
 MenuCreate			proto
 Main				proto
 
+ImportActionProc	proto
+ExportActionProc	proto
+
+SetWindowSize			proto		wt:DWORD, ht:DWORD
+
 PlaySoundOnClick	proto	:DWORD
+
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
@@ -59,7 +65,10 @@ PlaySoundOnClick	proto	:DWORD
 	zeroQuoteBrush	equ		39
 	
 	
+	szBrushBuffer			db			16			dup(0)
 	
+	MAX_WIDTH				equ			150
+	MAX_HEIGHT				equ			50	
 
 .data	
 	ConsoleRecord			INPUT_RECORD	<>
@@ -67,11 +76,16 @@ PlaySoundOnClick	proto	:DWORD
 	;hIn			dd			0
 	;hOut		dd			0
 	;nRead		dd			0
+	hWnd		dd			0
+	
 	
 	szClear						db			"cls", 0
-	szTitle						db			"CMDrawer v0.2.", 0
 	szPlayOnClick				db			"Audio/Click.wav", 0
+	
+	screenSize		RECT		<0,0,0,0>
 	
 	
 	; DRAWING
-	szToDraw	db		    5	dup(0)
+	szToDraw	db		    2	dup(0)
+	drawSize	dd			1
+	drawColor	dd			cWhite

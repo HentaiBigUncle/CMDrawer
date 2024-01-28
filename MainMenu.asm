@@ -1,7 +1,5 @@
 
 
-SetWindowSize			proto		wt:DWORD, ht:DWORD
-
 MenuCreate				proto
 LogoCreate				proto
 DrawAreaCreate			proto
@@ -17,9 +15,6 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 
 
 .const
-
-	MAX_WIDTH				equ			150
-	MAX_HEIGHT				equ			50
 	
 	WORKING_AREA_WIDTH		equ			120
 	WORKING_AREA_HEIGHT		equ			40
@@ -34,8 +29,9 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szToolsArea				db			"TOOLS", 0
 	szClearButtonText		db			"Clear", 0
 	szExportButtonText		db			"Export", 0
+	szImportButtonText		db			"Import", 0
 	szEraserButtonText      db			"Eraser", 0
-	szProgramVersion		db			"CMDrawer Version 1.2.0", 0
+	szProgramVersion		db			"CMDrawer Version 1.2.2", 0
 	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
@@ -50,7 +46,6 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 MenuCreate proc	uses ecx esi edi
 
 	invoke crt_system, offset szClear
-	invoke SetWindowSize, MAX_WIDTH, MAX_HEIGHT
 	invoke LogoCreate
 	invoke DrawAreaCreate
 	invoke ToolsAreaCreate
@@ -58,23 +53,6 @@ MenuCreate proc	uses ecx esi edi
 	
 	Ret
 MenuCreate endp
-
-SetWindowSize proc uses ebx esi edi wd:DWORD, ht:DWORD
-	
-	LOCAL hOut: DWORD
-	
-	invoke GetStdHandle, STD_OUTPUT_HANDLE
-	mov hOut, eax
-	
-	mov ebx, ht
-	shl ebx, 16
-	or ebx, wd
-	
-	invoke SetConsoleScreenBufferSize, hOut, ebx
-	invoke SetConsoleWindowInfo, hOut, 1, offset srect
-	
-	Ret
-SetWindowSize endp
 
 LogoCreate proc uses ebx esi edi
 	
@@ -259,8 +237,19 @@ SpecialButtonsCreate proc uses ebx esi edi
 	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT
 	
 	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
-	invoke PutCursorToPos, 143, WORKING_AREA_HEIGHT-1
+	invoke PutCursorToPos, 142, WORKING_AREA_HEIGHT-1
 	invoke crt_printf, offset szExportButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	
+	; Import Button Creating
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-4
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-5
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+32, WORKING_AREA_HEIGHT-4
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-3
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, 142, WORKING_AREA_HEIGHT-4
+	invoke crt_printf, offset szImportButtonText
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	
 	; Eraser Button Creating
