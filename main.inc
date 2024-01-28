@@ -115,7 +115,7 @@ KeyController		proto				:DWORD, :DWORD
 	
 	; DRAWING
 	szToDraw	db		    2	dup(0)
-	drawSize	dd			3
+	drawSize	dd			1
 	drawColor	dd			cWhite
 	
 	

@@ -4,7 +4,7 @@ MenuCreate				proto
 LogoCreate				proto
 DrawAreaCreate			proto
 ToolsAreaCreate			proto
-SizeToolCreate			proto
+SizeAndColorToolCreate	proto
 ExtraInfoAreaCreate		proto
 CreateButton			proto		:BYTE, :DWORD, :DWORD
 ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
@@ -32,12 +32,14 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szExportButtonText		db			"Export", 0
 	szImportButtonText		db			"Import", 0
 	szEraserButtonText      db			"Eraser", 0
-	szProgramVersion		db			"CMDrawer Version 1.3.0", 0
+	szSizeText				db			"SIZE:", 0
+	szColorText				db			"COLORS:", 0
+	szProgramVersion		db			"CMDrawer Version 1.3.2", 0
 	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
-	interfaceFontColor			dd			cYellow
+	interfaceFontColor			dd			LightBlue
 	interfaceBorderColor		dd			cWhite
 
 
@@ -49,6 +51,7 @@ MenuCreate proc	uses ecx esi edi
 	invoke LogoCreate
 	invoke DrawAreaCreate
 	invoke ToolsAreaCreate
+	invoke SizeAndColorToolCreate
 	invoke ExtraInfoAreaCreate
 	
 	Ret
@@ -290,13 +293,38 @@ SpecialButtonsCreate proc uses ecx esi edi
 	invoke PutCursorToPos, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-5
 	invoke crt_printf, offset szEraserButtonText
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
-	
-		
+			
 	Ret
 SpecialButtonsCreate endp
 
-SizeToolCreate proc uses ecx esi edi
-
+SizeAndColorToolCreate proc uses ecx esi edi
+	
+	LOCAL hOut: DWORD
+	
+	invoke GetStdHandle, STD_OUTPUT_HANDLE
+	mov hOut, eax
+		
+	; Size Text Creating
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, WORKING_AREA_WIDTH+23, 19
+	invoke crt_printf, offset szSizeText
+	; Colors Text Creating
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, WORKING_AREA_WIDTH+7, 19
+	invoke crt_printf, offset szColorText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+	
+	invoke ButtonCreate2, '1', WORKING_AREA_WIDTH+18, 20
+	invoke ButtonCreate2, '2', WORKING_AREA_WIDTH+23, 20
+	invoke ButtonCreate2, '3', WORKING_AREA_WIDTH+28, 20
+	
+	invoke ButtonCreate2, '4', WORKING_AREA_WIDTH+18, 23
+	invoke ButtonCreate2, '5', WORKING_AREA_WIDTH+23, 23
+	invoke ButtonCreate2, '6', WORKING_AREA_WIDTH+28, 23
+	
+	invoke ButtonCreate2, '7', WORKING_AREA_WIDTH+18, 26
+	invoke ButtonCreate2, '8', WORKING_AREA_WIDTH+23, 26
+	invoke ButtonCreate2, '9', WORKING_AREA_WIDTH+28, 26
 
 	Ret
-SizeToolCreate endp
+SizeAndColorToolCreate endp

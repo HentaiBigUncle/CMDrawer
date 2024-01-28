@@ -341,6 +341,46 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 				mov byte ptr[szToDraw], tildaBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick	
+			
+			
+			; SIZE BUTTONS CHECKS
+			
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 20 && bx < 23
+			
+				mov byte ptr[drawSize], 1
+				
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 20 && bx < 23
+			
+				mov byte ptr[drawSize], 2	
+				
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 20 && bx < 23
+			
+				mov byte ptr[drawSize], 3
+				
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 23 && bx < 26
+			
+				mov byte ptr[drawSize], 4
+				
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 23 && bx < 26
+			
+				mov byte ptr[drawSize], 5	
+				
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 23 && bx < 26
+			
+				mov byte ptr[drawSize], 6
+				
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 26 && bx < 29
+			
+				mov byte ptr[drawSize], 7
+								
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 26 && bx < 29
+			
+				mov byte ptr[drawSize], 8
+								
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 26 && bx < 29
+			
+				mov byte ptr[drawSize], 8
+			
 											
 			; SPECIAL BUTTONS CHECKS
 			
