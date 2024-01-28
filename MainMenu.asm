@@ -4,6 +4,7 @@ MenuCreate				proto
 LogoCreate				proto
 DrawAreaCreate			proto
 ToolsAreaCreate			proto
+SizeToolCreate			proto
 ExtraInfoAreaCreate		proto
 CreateButton			proto		:BYTE, :DWORD, :DWORD
 ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
@@ -41,7 +42,6 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 
 
 
-
 .code
 MenuCreate proc	uses ecx esi edi
 
@@ -54,7 +54,7 @@ MenuCreate proc	uses ecx esi edi
 	Ret
 MenuCreate endp
 
-LogoCreate proc uses ebx esi edi
+LogoCreate proc uses ecx esi edi
 	
 	LOCAL hOut: DWORD
 	
@@ -76,7 +76,7 @@ LogoCreate proc uses ebx esi edi
 	Ret
 LogoCreate endp
 
-DrawAreaCreate proc uses ebx esi edi
+DrawAreaCreate proc uses ecx esi edi
 
 	invoke VerticalBorderConstruct, WORKING_AREA_HEIGHT, 0, 1
 	invoke VerticalBorderConstruct, WORKING_AREA_HEIGHT, WORKING_AREA_WIDTH+1, 1
@@ -85,7 +85,7 @@ DrawAreaCreate proc uses ebx esi edi
 	Ret
 DrawAreaCreate endp
 
-ToolsAreaCreate proc uses ebx esi edi
+ToolsAreaCreate proc uses ecx esi edi
 	LOCAL hOut: DWORD
 	
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
@@ -107,12 +107,40 @@ ToolsAreaCreate proc uses ebx esi edi
 	invoke ButtonCreate2, dollarBrush, WORKING_AREA_WIDTH+18, 3
 	invoke ButtonCreate2, comAndBrush, WORKING_AREA_WIDTH+23, 3
 	invoke ButtonCreate2, zeroQuoteBrush, WORKING_AREA_WIDTH+28, 3	
+	
+	invoke ButtonCreate2, parenthOBrush, WORKING_AREA_WIDTH+3, 6
+	invoke ButtonCreate2, parenthCBrush, WORKING_AREA_WIDTH+8, 6
+	invoke ButtonCreate2, multiplBrush, WORKING_AREA_WIDTH+13, 6
+	invoke ButtonCreate2, plusBrush, WORKING_AREA_WIDTH+18, 6
+	invoke ButtonCreate2, commaBrush, WORKING_AREA_WIDTH+23, 6
+	invoke ButtonCreate2, minusBrush, WORKING_AREA_WIDTH+28, 6
+
+	invoke ButtonCreate2, dotBrush, WORKING_AREA_WIDTH+3, 9
+	invoke ButtonCreate2, slashBrush, WORKING_AREA_WIDTH+8, 9
+	invoke ButtonCreate2, colonBrush, WORKING_AREA_WIDTH+13, 9
+	invoke ButtonCreate2, semicolonBrush, WORKING_AREA_WIDTH+18, 9
+	invoke ButtonCreate2, lessBrush, WORKING_AREA_WIDTH+23, 9
+	invoke ButtonCreate2, equalBrush, WORKING_AREA_WIDTH+28, 9
+	
+	invoke ButtonCreate2, moreBrush, WORKING_AREA_WIDTH+3, 12
+	invoke ButtonCreate2, questionBrush, WORKING_AREA_WIDTH+8, 12
+	invoke ButtonCreate2, atBrush, WORKING_AREA_WIDTH+13, 12
+	invoke ButtonCreate2, squareOBrush, WORKING_AREA_WIDTH+18, 12
+	invoke ButtonCreate2, backSlashBrush, WORKING_AREA_WIDTH+23, 12
+	invoke ButtonCreate2, squareCBrush, WORKING_AREA_WIDTH+28, 12
+	
+	invoke ButtonCreate2, birdBrush, WORKING_AREA_WIDTH+3, 15
+	invoke ButtonCreate2, traitBrush, WORKING_AREA_WIDTH+8, 15
+	invoke ButtonCreate2, braceOBrush, WORKING_AREA_WIDTH+13, 15
+	invoke ButtonCreate2, directBrush, WORKING_AREA_WIDTH+18, 15
+	invoke ButtonCreate2, braceCBrush, WORKING_AREA_WIDTH+23, 15
+	invoke ButtonCreate2, minusBrush, WORKING_AREA_WIDTH+28, 15
 
 	invoke SpecialButtonsCreate
 	Ret
 ToolsAreaCreate endp
 
-ExtraInfoAreaCreate proc uses ebx esi edi
+ExtraInfoAreaCreate proc uses ecx esi edi
 
 	LOCAL hOut: DWORD
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
@@ -211,7 +239,7 @@ ButtonCreate2 proc uses ebx ecx esi edi chr:BYTE, xCor:DWORD, yCor:DWORD
 	Ret
 ButtonCreate2 endp
 
-SpecialButtonsCreate proc uses ebx esi edi
+SpecialButtonsCreate proc uses ecx esi edi
 
 	LOCAL hOut: DWORD
 	
@@ -266,3 +294,9 @@ SpecialButtonsCreate proc uses ebx esi edi
 		
 	Ret
 SpecialButtonsCreate endp
+
+SizeToolCreate proc uses ecx esi edi
+
+
+	Ret
+SizeToolCreate endp

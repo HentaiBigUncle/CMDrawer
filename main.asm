@@ -177,24 +177,24 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
 				
-				;invoke SetConsoleCursorPosition, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
-				;fn crt_puts, offset szToDraw
 				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+			
+			; FIRST ROW OF BRUSHES
 				
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 3 && bx < 6
 			
+				invoke PlaySoundOnClick, offset szPlayOnClick			
 				mov byte ptr[szToDraw], exclBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx > 3 && bx < 6
 			
-				mov byte ptr[szToDraw], quoteBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov byte ptr[szToDraw], quoteBrush
 				
 			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx > 3 && bx < 6
 			
-				mov byte ptr[szToDraw], sharpBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov byte ptr[szToDraw], sharpBrush
 				
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 3 && bx < 6
 			
@@ -210,8 +210,138 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], zeroQuoteBrush	
-								
+			
+			; SECOND ROW OF BRUSHES
 				
+			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 6 && bx < 9
+			
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov byte ptr[szToDraw], parenthOBrush
+				
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx > 6 && bx < 9
+			
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov byte ptr[szToDraw], parenthCBrush
+				
+			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx > 6 && bx < 9
+			
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov byte ptr[szToDraw], multiplBrush
+				
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 6 && bx < 9
+			
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov byte ptr[szToDraw], plusBrush
+				
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 6 && bx < 9
+			
+				mov byte ptr[szToDraw], commaBrush	
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 6 && bx < 9
+			
+				mov byte ptr[szToDraw], minusBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick	
+				
+				
+			; THIRD ROW OF BRUSHES
+			
+			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 9 && bx < 12
+			
+				mov byte ptr[szToDraw], dotBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx > 9 && bx < 12
+			
+				mov byte ptr[szToDraw], slashBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx > 9 && bx < 12
+			
+				mov byte ptr[szToDraw], colonBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 9 && bx < 12
+			
+				mov byte ptr[szToDraw], semicolonBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 9 && bx < 12
+			
+				mov byte ptr[szToDraw], lessBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick	
+				
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 9 && bx < 12
+			
+				mov byte ptr[szToDraw], equalBrush	
+				invoke PlaySoundOnClick, offset szPlayOnClick			
+			
+			
+			; FOURTH ROW OF BRUSHES
+		
+			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 12 && bx < 15
+			
+				mov byte ptr[szToDraw], moreBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx > 12 && bx < 15
+			
+				mov byte ptr[szToDraw], questionBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx > 12 && bx < 15
+			
+				mov byte ptr[szToDraw], atBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 12 && bx < 15
+			
+				mov byte ptr[szToDraw], squareOBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 12 && bx < 15
+			
+				mov byte ptr[szToDraw], backSlashBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick	
+				
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 12 && bx < 15
+			
+				mov byte ptr[szToDraw], squareCBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick	
+		
+			
+			; FIFTH ROW OF BRUSHES
+		
+			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx > 15 && bx < 18
+			
+				mov byte ptr[szToDraw], birdBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx > 15 && bx < 18
+			
+				mov byte ptr[szToDraw], traitBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx > 15 && bx < 18
+			
+				mov byte ptr[szToDraw], braceOBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 15 && bx < 18
+			
+				mov byte ptr[szToDraw], directBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				
+			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 15 && bx < 18
+			
+				mov byte ptr[szToDraw], braceCBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick	
+				
+			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 15 && bx < 18
+			
+				mov byte ptr[szToDraw], tildaBrush
+				invoke PlaySoundOnClick, offset szPlayOnClick	
+											
 			; SPECIAL BUTTONS CHECKS
 			
 			; CLEAR	

@@ -60,9 +60,40 @@ KeyController		proto				:DWORD, :DWORD
 	quoteBrush      equ		34
 	sharpBrush		equ		35
 	dollarBrush		equ		36
-	; percentBrush	equ		37
 	comAndBrush		equ		38
 	zeroQuoteBrush	equ		39
+	
+	parenthOBrush	equ		40
+	parenthCBrush	equ		41
+	multiplBrush	equ		42
+	plusBrush		equ		43
+	commaBrush		equ		44
+	minusBrush		equ		45
+	
+	dotBrush		equ		46
+	slashBrush		equ		47
+	colonBrush		equ		58
+	semicolonBrush	equ		59
+	lessBrush		equ		60
+	equalBrush		equ		61
+	
+	moreBrush 		equ		62
+	questionBrush	equ		63
+	atBrush			equ		64
+	squareOBrush	equ		91
+	backSlashBrush	equ		92
+	squareCBrush	equ		93
+	
+	birdBrush		equ		94
+	traitBrush		equ		95
+	braceOBrush		equ		123
+	directBrush		equ		124
+	braceCBrush		equ		125
+	tildaBrush		equ		126
+	
+	
+	
+	
 	
 	MAX_WIDTH				equ			150
 	MAX_HEIGHT				equ			50	
@@ -84,5 +115,8 @@ KeyController		proto				:DWORD, :DWORD
 	
 	; DRAWING
 	szToDraw	db		    2	dup(0)
-	drawSize	dd			10
+	drawSize	dd			3
 	drawColor	dd			cWhite
+	
+	
+	
