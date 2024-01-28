@@ -31,7 +31,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szExportButtonText		db			"Export", 0
 	szImportButtonText		db			"Import", 0
 	szEraserButtonText      db			"Eraser", 0
-	szProgramVersion		db			"CMDrawer Version 1.2.2", 0
+	szProgramVersion		db			"CMDrawer Version 1.3.0", 0
 	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer

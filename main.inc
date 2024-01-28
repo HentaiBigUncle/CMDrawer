@@ -16,20 +16,20 @@ includelib \masm32\lib\winmm.lib
 includelib \masm32\lib\user32.lib
 
 
-DrawCell				proto   :DWORD, :DWORD
+PutCursorToPos			proto 			:DWORD, :DWORD
+HideCursor				proto
+MenuCreate				proto
+Main					proto
 
-PutCursorToPos		proto 	:DWORD, :DWORD
-HideCursor			proto
-MenuCreate			proto
-Main				proto
+ImportActionProc		proto
+ExportActionProc		proto
 
-ImportActionProc	proto
-ExportActionProc	proto
+SetWindowSize			proto		 	wt:DWORD, ht:DWORD
 
-SetWindowSize			proto		wt:DWORD, ht:DWORD
+PlaySoundOnClick		proto			:DWORD
+DrawCell				proto  			:DWORD, :DWORD
 
-PlaySoundOnClick	proto	:DWORD
-
+KeyController		proto				:DWORD, :DWORD
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
@@ -64,9 +64,6 @@ PlaySoundOnClick	proto	:DWORD
 	comAndBrush		equ		38
 	zeroQuoteBrush	equ		39
 	
-	
-	szBrushBuffer			db			16			dup(0)
-	
 	MAX_WIDTH				equ			150
 	MAX_HEIGHT				equ			50	
 
@@ -81,11 +78,11 @@ PlaySoundOnClick	proto	:DWORD
 	
 	szClear						db			"cls", 0
 	szPlayOnClick				db			"Audio/Click.wav", 0
-	
+	szBrushBuffer			db			16			dup(0)
+		
 	screenSize		RECT		<0,0,0,0>
-	
 	
 	; DRAWING
 	szToDraw	db		    2	dup(0)
-	drawSize	dd			1
+	drawSize	dd			10
 	drawColor	dd			cWhite
