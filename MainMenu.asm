@@ -11,6 +11,7 @@ ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
 SpecialButtonsCreate	proto
 ColoredSquareCreate		proto		:DWORD, :DWORD, :DWORD
 
+ClearPaint				proto
 
 HorizontalBorderConstruct	proto	:DWORD, :DWORD, :DWORD
 VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
@@ -45,7 +46,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	interfaceFontColor			dd			LightBlue
 	interfaceBorderColor		dd			cWhite
 
-
+	szEmptyLine				db		WORKING_AREA_WIDTH		dup(32), 0
 
 .code
 MenuCreate proc	uses ecx esi edi
@@ -332,26 +333,26 @@ SizeAndColorToolCreate proc uses ecx esi edi
 	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 21, cBgBlue
 	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 21, cBgGreen
 	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 21, cBgCyan
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 21, cBgMagenta
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 21, cBrown
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 21, cBgRed
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 21, cBgMagenta
 	
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 23, BgLightGray
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 23, BgDarkGray
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 23, BgLightBlue	
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 23, BgLightGreen
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 23, BgLightCyan
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 23, cBgBrown
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 23, BgLightGray
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 23, BgDarkGray	
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 23, BgLightBlue
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 23, BgLightGreen
 	
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 25, BgLightRed
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 25, BgLightMagenta
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 25, cBgYellow
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 25, cBgWhite
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 25, BgLightCyan
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 25, BgLightRed
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 25, BgLightMagenta
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 25, cBgYellow
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 25, cBgWhite
 	
 	Ret
 SizeAndColorToolCreate endp
 
 ColoredSquareCreate proc uses ebx esi edi xCor: DWORD, yCor: DWORD, color: DWORD
 	
-	add color, 10h
 	invoke SetColor, color
 	
 	mov ebx, yCor
@@ -368,3 +369,17 @@ ColoredSquareCreate proc uses ebx esi edi xCor: DWORD, yCor: DWORD, color: DWORD
 	
 	Ret
 ColoredSquareCreate endp
+
+ClearPaint proc uses ebx esi edi
+
+	mov ebx, 4
+	.while ebx <= WORKING_AREA_HEIGHT
+	
+		invoke PutCursorToPos, 1, ebx
+		invoke crt_printf, offset szEmptyLine
+		inc ebx
+	
+	.endw
+
+	Ret
+ClearPaint endp

@@ -380,16 +380,82 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 26 && bx < 29
 			
 				mov byte ptr[drawSize], 8
+				
 			
-											
+			; <<< ---------   COLOR BUTTONS CHECK   ------------- >>>
+			
+			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 21 && bx <= 22
+			
+				invoke SetColor, cBlue
+				
+			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 21 && bx <= 22
+			
+				invoke SetColor, cGreen
+							
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 21 && bx <= 22
+			
+				invoke SetColor, cCyan
+				
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 21 && bx <= 22
+			
+				invoke SetColor, cRed
+								
+			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 21 && bx <= 22
+			
+				invoke SetColor, cMagenta	
+			
+			; SECOND ROW
+			
+			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 23 && bx <= 24
+			
+				invoke SetColor, cBrown
+				
+			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 23 && bx <= 24
+			
+				invoke SetColor, LightGray
+							
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 23 && bx <= 24
+			
+				invoke SetColor, DarkGray
+				
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 23 && bx <= 24
+			
+				invoke SetColor, LightBlue
+								
+			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 23 && bx <= 24
+			
+				invoke SetColor, LightGreen
+				
+			; THIRD ROW
+			
+			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 25 && bx <= 26
+			
+				invoke SetColor, LightCyan
+				
+			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 25 && bx <= 26
+			
+				invoke SetColor, LightRed
+							
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 25 && bx <= 26
+			
+				invoke SetColor, LightMagenta
+				
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 25 && bx <= 26
+			
+				invoke SetColor, cYellow
+								
+			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 25 && bx <= 26
+			
+				invoke SetColor, cWhite
+				
+												
 			; SPECIAL BUTTONS CHECKS
 			
 			; CLEAR	
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+16 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
-				invoke MenuCreate
-				invoke SetConsoleMode, hIn, ENABLE_MOUSE_INPUT or ENABLE_EXTENDED_FLAGS or ENABLE_LINE_INPUT or ENABLE_ECHO_INPUT or ENABLE_PROCESSED_INPUT
+				invoke ClearPaint
 				
 			; EXPORT
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
