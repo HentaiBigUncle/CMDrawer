@@ -419,4 +419,11 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 	Ret
 KeyController endp
 
+SetColor proc uses ebx esi edi color: DWORD
+
+	invoke SetConsoleTextAttribute, rv(GetStdHandle, STD_OUTPUT_HANDLE), color
+
+	Ret
+SetColor endp
+
 end start

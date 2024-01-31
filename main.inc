@@ -25,6 +25,7 @@ ImportActionProc		proto
 ExportActionProc		proto
 
 SetWindowSize			proto		 	wt:DWORD, ht:DWORD
+SetColor				proto			:DWORD
 
 PlaySoundOnClick		proto			:DWORD
 DrawCell				proto  			:DWORD, :DWORD

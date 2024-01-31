@@ -9,6 +9,8 @@ ExtraInfoAreaCreate		proto
 CreateButton			proto		:BYTE, :DWORD, :DWORD
 ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
 SpecialButtonsCreate	proto
+ColoredSquareCreate		proto		:DWORD, :DWORD, :DWORD
+
 
 HorizontalBorderConstruct	proto	:DWORD, :DWORD, :DWORD
 VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
@@ -36,6 +38,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szColorText				db			"COLORS:", 0
 	szProgramVersion		db			"CMDrawer Version 1.3.2", 0
 	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
+	szThreeSpaces			db			"   ", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
@@ -325,6 +328,33 @@ SizeAndColorToolCreate proc uses ecx esi edi
 	invoke ButtonCreate2, '7', WORKING_AREA_WIDTH+18, 26
 	invoke ButtonCreate2, '8', WORKING_AREA_WIDTH+23, 26
 	invoke ButtonCreate2, '9', WORKING_AREA_WIDTH+28, 26
+	
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 20, cBlue
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 6, 20, cGreen
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 10, 20, cCyan
+	;invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 3, 20, cMagenta
+	;invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 3, 20, cBrown
+	;invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 3, 20, LightGray
 
 	Ret
 SizeAndColorToolCreate endp
+
+ColoredSquareCreate proc uses ebx esi edi xCor: DWORD, yCor: DWORD, color: DWORD
+	
+	add color, 10h
+	invoke SetColor, color
+	
+	mov ebx, yCor
+	
+	invoke PutCursorToPos, xCor, ebx
+	invoke crt_printf, offset szThreeSpaces
+	
+	inc ebx
+	
+	invoke PutCursorToPos, xCor, ebx
+	invoke crt_printf, offset szThreeSpaces
+	
+	invoke SetColor, interfaceBorderColor
+	
+	Ret
+ColoredSquareCreate endp
