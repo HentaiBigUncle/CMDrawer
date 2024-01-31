@@ -54,6 +54,22 @@ KeyController		proto				:DWORD, :DWORD
 	cYellow				= 14
 	cWhite				= 15
 	
+	cBgBlue				= 10h
+	cBgGreen			= 20h
+	cBgCyan				= 30h
+	cBgRed				= 40h
+	cBgMagenta			= 50h
+	cBgBrown			= 60h
+	BgLightGray			= 70h
+	BgDarkGray			= 80h
+	BgLightBlue			= 90h
+	BgLightGreen		= 0a0h
+	BgLightCyan			= 0b0h
+	BgLightRed			= 0c0h
+	BgLightMagenta		= 0d0h
+	cBgYellow			= 0e0h
+	cBgWhite			= 0f0h
+	
 ;	BRUSHES:
 	eraseBrush  	equ		32		; space
 	

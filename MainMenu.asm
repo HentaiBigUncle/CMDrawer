@@ -329,13 +329,23 @@ SizeAndColorToolCreate proc uses ecx esi edi
 	invoke ButtonCreate2, '8', WORKING_AREA_WIDTH+23, 26
 	invoke ButtonCreate2, '9', WORKING_AREA_WIDTH+28, 26
 	
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 20, cBlue
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 6, 20, cGreen
-	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 10, 20, cCyan
-	;invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 3, 20, cMagenta
-	;invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 3, 20, cBrown
-	;invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 3, 20, LightGray
-
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 21, cBgBlue
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 21, cBgGreen
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 21, cBgCyan
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 21, cBgMagenta
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 21, cBrown
+	
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 23, BgLightGray
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 23, BgDarkGray
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 23, BgLightBlue	
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 23, BgLightGreen
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 14, 23, BgLightCyan
+	
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 2, 25, BgLightRed
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 5, 25, BgLightMagenta
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 8, 25, cBgYellow
+	invoke ColoredSquareCreate, WORKING_AREA_WIDTH + 11, 25, cBgWhite
+	
 	Ret
 SizeAndColorToolCreate endp
 
