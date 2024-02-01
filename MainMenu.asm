@@ -372,7 +372,7 @@ ColoredSquareCreate endp
 
 ClearPaint proc uses ebx esi edi
 
-	mov ebx, 4
+	mov ebx, 3
 	.while ebx <= WORKING_AREA_HEIGHT
 	
 		invoke PutCursorToPos, 1, ebx
