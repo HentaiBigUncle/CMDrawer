@@ -118,7 +118,7 @@ SetWindowSize endp
 
 DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	
-	invoke SetColor, drawColor
+	invoke SetColor, dword ptr[drawColor]
 	lea esi, szBrushBuffer
 	mov ebx, 0
 	
@@ -396,67 +396,82 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 21 && bx <= 22
 			
-				invoke SetColor, cBlue
+				mov eax, cBlue
+				mov dword ptr[drawColor], eax
 				
 			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 21 && bx <= 22
 			
-				invoke SetColor, cGreen
+				mov eax, cGreen
+				mov dword ptr[drawColor], eax
 							
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 21 && bx <= 22
 			
-				invoke SetColor, cCyan
+				mov eax, cCyan
+				mov dword ptr[drawColor], eax
 				
 			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 21 && bx <= 22
 			
-				invoke SetColor, cRed
+				mov eax, cRed
+				mov dword ptr[drawColor], eax
 								
 			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 21 && bx <= 22
 			
-				invoke SetColor, cMagenta	
+				mov eax, cMagenta
+				mov dword ptr[drawColor], eax
 			
 			; SECOND ROW
 			
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 23 && bx <= 24
 			
-				invoke SetColor, cBrown
+				mov eax, cBrown
+				mov dword ptr[drawColor], eax
 				
 			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 23 && bx <= 24
 			
-				invoke SetColor, LightGray
+				mov eax, LightGray
+				mov dword ptr[drawColor], eax
 							
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 23 && bx <= 24
 			
-				invoke SetColor, DarkGray
+				mov eax, DarkGray
+				mov dword ptr[drawColor], eax
 				
 			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 23 && bx <= 24
 			
-				invoke SetColor, LightBlue
+				mov eax, LightBlue
+				mov dword ptr[drawColor], eax
 								
 			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 23 && bx <= 24
 			
-				invoke SetColor, LightGreen
+				mov eax, LightGreen
+				mov dword ptr[drawColor], eax
 				
 			; THIRD ROW
 			
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 25 && bx <= 26
 			
-				invoke SetColor, LightCyan
+				mov eax, LightCyan
+				mov dword ptr[drawColor], eax
 				
 			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 25 && bx <= 26
 			
-				invoke SetColor, LightRed
+				mov eax, LightRed
+				mov dword ptr[drawColor], eax
 							
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 25 && bx <= 26
 			
-				invoke SetColor, LightMagenta
+				mov eax, LightMagenta
+				mov dword ptr[drawColor], eax
 				
 			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 25 && bx <= 26
 			
-				invoke SetColor, cYellow
+				mov eax, cYellow
+				mov dword ptr[drawColor], eax
 								
 			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 25 && bx <= 26
 			
-				invoke SetColor, cWhite
+				mov eax, cWhite
+				mov dword ptr[drawColor], eax
 				
 												
 			; SPECIAL BUTTONS CHECKS
