@@ -16,26 +16,32 @@ includelib \masm32\lib\winmm.lib
 includelib \masm32\lib\user32.lib
 
 
-PutCursorToPos			proto 			:DWORD, :DWORD
-HideCursor				proto
-MenuCreate				proto
-Main					proto
+PutCursorToPos					proto 			:DWORD, :DWORD
+HideCursor						proto
+MenuCreate						proto
+Main							proto
 
-ImportActionProc		proto
-ExportActionProc		proto
+ImportActionProc				proto
+ExportActionProc				proto
 
-SetWindowSize			proto		 	wt:DWORD, ht:DWORD
-SetColor				proto			:DWORD
+SetWindowSize					proto		 	wt:DWORD, ht:DWORD
+SetColor						proto			:DWORD
 
-PlaySoundOnClick		proto			:DWORD
-DrawCell				proto  			:DWORD, :DWORD
+PlaySoundOnClick				proto			:DWORD
+DrawCell						proto  			:DWORD, :DWORD
 
-KeyController		proto				:DWORD, :DWORD
+KeyController					proto				:DWORD, :DWORD
+
+ExportImageEvent				proto
+ImportImageEvent 				proto
+
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
 	VERTICAL_BORDER_LENGTH		equ		81
 	
+	MAX_WIDTH				equ			150
+	MAX_HEIGHT				equ			50
 	; COLORS
 	cBlack				= 0
 	cBlue				= 1
@@ -109,24 +115,23 @@ KeyController		proto				:DWORD, :DWORD
 	tildaBrush		equ		126
 	
 	
-	
-	
-	
-	MAX_WIDTH				equ			150
-	MAX_HEIGHT				equ			50	
 
 .data	
 	ConsoleRecord			INPUT_RECORD	<>
-
-	;hIn			dd			0
-	;hOut		dd			0
-	;nRead		dd			0
-	hWnd		dd			0
 	
+	hWnd		dd			0
+	hFile		dd			0
 	
 	szClear						db			"cls", 0
 	szPlayOnClick				db			"Audio/Click.wav", 0
+	
+	szImage						db			"Image.txt", 0
+	szTxt						db			".txt", 0
+	szNewLine					db			13, 10, 0
+	
 	szBrushBuffer			db			16			dup(0)
+	szBuffer1				db			64			dup(0)
+	szBuffer2				db			128			dup(0)
 		
 	screenSize		RECT		<0,0,0,0>
 	
