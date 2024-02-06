@@ -10,6 +10,6 @@
 
 **·** Use some other tools
 
-Current version: 1.3.2
+Current version: 1.4.5
 
 ![CMDRAWERYUHU](https://github.com/Mishanya00/CMDrawer/assets/116641987/e0d29122-6bf4-4aa7-9de8-d4d63f34340b)
