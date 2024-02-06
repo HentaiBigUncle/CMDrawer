@@ -6,9 +6,9 @@
 
 **·** Clear working area if needed
 
-**·** Export your drawing to .txt file (not done)
+**·** Export your drawing to .txt file
 
-**·** Use some other tools (not done)
+**·** Use some other tools
 
 Current version: 1.3.2
 
