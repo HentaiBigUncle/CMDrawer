@@ -470,26 +470,14 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; EXPORT
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
 			
-				invoke ExportImageEvent
 				invoke PlaySoundOnClick, offset szPlayOnClick
-			
-				invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
-				
-				invoke SetColor, cGreen
-				fn crt_printf, "Picture saved to image.txt. "
-				fn crt_printf, "Be Careful, you can save ONLY 1 picture at the moment"
-				
-				invoke Sleep, 1000
-				
-				invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
-				invoke SetColor, DarkGray
-				fn crt_printf, "Picture saved to image.txt. Be Careful, you can save ONLY 1 picture at the moment"
+				invoke ExportImageEvent
 				
 			; IMPORT	
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
 			
-				invoke ImportImageEvent
 				invoke PlaySoundOnClick, offset szPlayOnClick
+				invoke ImportImageEvent
 			
 			; ERASER	
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
@@ -548,6 +536,18 @@ ExportImageEvent proc uses ebx esi edi
 	
 	invoke CloseHandle, hFileExport
 	
+	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+	
+	invoke SetColor, cGreen
+	fn crt_printf, "Picture saved to image.txt. "
+	fn crt_printf, "Be Careful, you can save ONLY 1 picture at the moment"
+	
+	invoke Sleep, 1000
+	
+	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+	invoke SetColor, DarkGray
+	fn crt_printf, "Picture saved to image.txt. Be Careful, you can save ONLY 1 picture at the moment"
+	
 	Ret
 ExportImageEvent endp
 
@@ -580,6 +580,21 @@ ImportImageEvent proc uses ebx esi edi
 	.endw
 	
 	invoke CloseHandle, hFileImport
+	
+	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+	fn crt_printf, "                                                                                                            "
+	
+	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+	
+	invoke SetColor, cGreen
+	fn crt_printf, "Picture has been successfully imported from Image1.txt"
+	
+	invoke Sleep, 1000
+	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+	
+	invoke SetColor, DarkGray
+	fn crt_printf, "Picture has been successfully imported from Image1.txt"	
+	
 	Ret
 ImportImageEvent endp
 
