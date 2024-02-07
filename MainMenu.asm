@@ -37,7 +37,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szEraserButtonText      db			"Eraser", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
-	szProgramVersion		db			"CMDrawer Version 1.5.1", 0
+	szProgramVersion		db			"CMDrawer Version 1.5.2", 0
 	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
 	szThreeSpaces			db			"   ", 0
 	

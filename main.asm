@@ -567,18 +567,74 @@ ImportImageEvent proc uses ebx esi edi
 	
 	invoke SetColor, drawColor
 	
-	.while ebx < 41
+@@OuterLoop:
 	
+		mov esi, offset szBuffer2
+		
 		invoke PutCursorToPos, 1, ebx
 		
-		invoke ReadFile, hFileImport, offset szBuffer2, WORKING_AREA_WIDTH+2, addr nRead, 0
+		mov edi, 0
 		
+	@@InnerLoop:
+
+		cmp edi, 120
+		jne @F
+		
+		mov byte ptr[esi], 0
+		
+		invoke crt_printf, offset szBuffer2
+		
+		mov esi, offset szBuffer2
+		
+		.while byte ptr[esi] != 13 && dword ptr[nRead] != 0
+		
+			invoke ReadFile, hFileImport, esi, 1, addr nRead, 0
+		
+		.endw
+		
+		invoke ReadFile, hFileImport, esi, 1, addr nRead, 0
+		
+		mov byte ptr[esi], 0
+		
+		inc ebx
+		
+		jmp @@OuterLoop
+		
+	@@:
+		invoke ReadFile, hFileImport, esi, 1, addr nRead, 0
+		
+		cmp dword ptr[nRead], 0
+		je @@ExitLoop
+		
+		cmp byte ptr[esi], 13
+		je @F
+		
+		inc esi
+		inc edi
+		
+		jmp @@InnerLoop
+		
+	@@:
+	
+		mov byte ptr[esi], 0
+		
+		invoke ReadFile, hFileImport, offset szBuffer1, 1, addr nRead, 0	
+	
 		invoke crt_printf, offset szBuffer2
 		
 		inc ebx
 		
-	.endw
+		cmp ebx, 41
+		je @@ExitDrawProcess
+		
+		jmp @@OuterLoop
+		
+@@ExitLoop:
 	
+	invoke crt_printf, offset szBuffer2
+	
+@@ExitDrawProcess:
+
 	invoke CloseHandle, hFileImport
 	
 	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
