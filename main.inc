@@ -21,9 +21,6 @@ HideCursor						proto
 MenuCreate						proto
 Main							proto
 
-ImportActionProc				proto
-ExportActionProc				proto
-
 SetWindowSize					proto		 	wt:DWORD, ht:DWORD
 SetColor						proto			:DWORD
 

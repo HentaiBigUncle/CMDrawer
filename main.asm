@@ -81,21 +81,6 @@ PlaySoundOnClick proc uses ecx esi edi lpFile:DWORD
 	Ret
 PlaySoundOnClick endp
 
-
-ImportActionProc proc uses ecx esi edi
-
-
-
-	Ret
-ImportActionProc endp
-
-ExportActionProc proc uses ecx esi edi
-
-
-
-	Ret
-ExportActionProc endp
-
 SetWindowSize proc uses ebx esi edi wd:DWORD, ht:DWORD
 	
 	LOCAL hOut: DWORD
@@ -490,11 +475,15 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 				invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
 				
-				invoke SetColor, LightGray
+				invoke SetColor, cGreen
 				fn crt_printf, "Picture saved to image.txt. "
-				
-				invoke SetColor, cRed
 				fn crt_printf, "Be Careful, you can save ONLY 1 picture at the moment"
+				
+				invoke Sleep, 1000
+				
+				invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+				invoke SetColor, DarkGray
+				fn crt_printf, "Picture saved to image.txt. Be Careful, you can save ONLY 1 picture at the moment"
 				
 			; IMPORT	
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
@@ -504,8 +493,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			; ERASER	
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
-				
-				;mov byte ptr[szToDraw], eraseBrush
+		
 				mov eax, cBlack
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
@@ -565,8 +553,33 @@ ExportImageEvent endp
 
 ImportImageEvent proc uses ebx esi edi
 
+	LOCAL hFileImport: DWORD
+	LOCAL nRead: DWORD
+	LOCAL hOut: DWORD	
 
-
+	invoke CreateFile, offset szImage, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0
+	mov hFileImport, eax
+	
+	invoke GetStdHandle, STD_OUTPUT_HANDLE
+	mov hOut, eax
+	
+	mov ebx, 3
+	
+	invoke SetColor, drawColor
+	
+	.while ebx < 41
+	
+		invoke PutCursorToPos, 1, ebx
+		
+		invoke ReadFile, hFileImport, offset szBuffer2, WORKING_AREA_WIDTH+2, addr nRead, 0
+		
+		invoke crt_printf, offset szBuffer2
+		
+		inc ebx
+		
+	.endw
+	
+	invoke CloseHandle, hFileImport
 	Ret
 ImportImageEvent endp
 
