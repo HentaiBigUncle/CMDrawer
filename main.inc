@@ -21,17 +21,22 @@ HideCursor						proto
 MenuCreate						proto
 Main							proto
 
-SetWindowSize					proto		 	wt:DWORD, ht:DWORD
-SetColor						proto			:DWORD
+SetWindowSize					proto		 	:DWORD, :DWORD
+SetColor						proto		    :DWORD
 
 PlaySoundOnClick				proto			:DWORD
 DrawCell						proto  			:DWORD, :DWORD
 
-KeyController					proto				:DWORD, :DWORD
+KeyController					proto			:DWORD, :DWORD
 
 ExportImageEvent				proto
 ImportImageEvent 				proto
 
+ClearBuffer						proto			:DWORD, :DWORD
+
+GetInput						proto			:DWORD, :DWORD
+ClearLine						proto			:DWORD
+ClearLogArea					proto
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
@@ -122,13 +127,20 @@ ImportImageEvent 				proto
 	szClear						db			"cls", 0
 	szPlayOnClick				db			"Audio/Click.wav", 0
 	
+	szGetFileName				db			"Enter file name: ", 0
+	szPictureExportedOld		db			"Picture saved to image.txt. Be Careful, you can save ONLY 1 picture at the moment", 0
+	szPictureExported			db			"Picture has been successfully saved! Be careful, you can rewrite existing files.", 0
+	szPictureImported			db			"Picture has been successfully imported from Image1.txt", 0
+	szFileNotFound 				db			"No .txt file with such name. Try again.", 0
+	szClearLine					db			"          ", 0  ; 10 spaces
+	
 	szImage						db			"Image.txt", 0
 	szTxt						db			".txt", 0
 	szNewLine					db			13, 10, 0
 	
 	szBrushBuffer			db			16			dup(0)
 	szBuffer1				db			64			dup(0)
-	szBuffer2				db			128			dup(0)
+	szBuffer2				db			256			dup(0)
 		
 	screenSize		RECT		<0,0,0,0>
 	

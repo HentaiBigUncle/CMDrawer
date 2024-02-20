@@ -44,6 +44,44 @@ Main proc	uses ebx ecx esi edi
 	Ret
 Main endp
 
+ClearBuffer proc uses ebx esi edi lpBuffer: DWORD, count: DWORD
+
+	; It's neccessary to use this procedure VERY CAREFULLY !!! YOU CAN REWRITE YOUR DATA !!!
+	
+	mov esi, lpBuffer
+	mov ebx, 0
+	
+	.while ebx < count
+	
+		mov byte ptr[esi], 0
+		
+		inc esi
+		inc ebx
+	
+	.endw
+	
+	Ret
+ClearBuffer endp
+
+ClearLine proc uses ebx esi edi yCor: DWORD
+
+	invoke PutCursorToPos, 0, yCor
+	invoke crt_printf, offset szEmptyLine
+
+	Ret
+ClearLine endp
+
+ClearLogArea proc uses ebx esi edi
+
+	invoke ClearLine, WORKING_AREA_HEIGHT+2
+	invoke ClearLine, WORKING_AREA_HEIGHT+3
+	invoke ClearLine, WORKING_AREA_HEIGHT+4
+	invoke ClearLine, WORKING_AREA_HEIGHT+5
+	invoke ClearLine, WORKING_AREA_HEIGHT+6
+
+	Ret
+ClearLogArea endp
+
 PutCursorToPos proc uses ebx esi edi xCor: DWORD, yCor: DWORD	
 	
 	mov ebx, yCor
@@ -462,24 +500,30 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; SPECIAL BUTTONS CHECKS
 			
 			; CLEAR	
+			
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+16 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ClearPaint
 				
 			; EXPORT
+			
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ExportImageEvent
 				
 			; IMPORT	
+			
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ImportImageEvent
-			
+				
+				invoke ClearBuffer, offset szBuffer2, 256
+				
 			; ERASER	
+			
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
 		
 				mov eax, cBlack
@@ -511,7 +555,15 @@ ExportImageEvent proc uses ebx esi edi
 	LOCAL nRead: DWORD
 	LOCAL hOut: DWORD
 
-	invoke CreateFile, offset szImage, GENERIC_WRITE, FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+	invoke ClearLogArea
+	
+	invoke SetColor, cWhite
+	invoke PutCursorToPos, 1, 42
+	
+	invoke ClearBuffer, offset szBuffer2, 256
+	invoke GetInput, offset szGetFileName, offset szBuffer2	
+		
+	invoke CreateFile, offset szBuffer2, GENERIC_WRITE, FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
 	mov hFileExport, eax
 	
 	mov ebx, 030001h
@@ -539,26 +591,54 @@ ExportImageEvent proc uses ebx esi edi
 	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
 	
 	invoke SetColor, cGreen
-	fn crt_printf, "Picture saved to image.txt. "
-	fn crt_printf, "Be Careful, you can save ONLY 1 picture at the moment"
+	invoke crt_printf, offset szPictureExported
 	
 	invoke Sleep, 1000
 	
 	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
 	invoke SetColor, DarkGray
-	fn crt_printf, "Picture saved to image.txt. Be Careful, you can save ONLY 1 picture at the moment"
+	invoke crt_printf, offset szPictureExported
 	
 	Ret
 ExportImageEvent endp
+
+GetInput proc uses ebx esi edi, lpOutputText: DWORD, lpInputText: DWORD
+	
+	invoke crt_printf, lpOutputText
+	invoke crt_gets, lpInputText
+
+	Ret
+GetInput endp
 
 ImportImageEvent proc uses ebx esi edi
 
 	LOCAL hFileImport: DWORD
 	LOCAL nRead: DWORD
-	LOCAL hOut: DWORD	
-
-	invoke CreateFile, offset szImage, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0
+	LOCAL hOut: DWORD
+		
+	invoke ClearLogArea
+	
+	invoke SetColor, cWhite
+	invoke PutCursorToPos, 1, 42
+	
+	invoke ClearBuffer, offset szBuffer2, 256
+	invoke GetInput, offset szGetFileName, offset szBuffer2	
+	
+	invoke CreateFile, offset szBuffer2, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0
 	mov hFileImport, eax
+	
+	.if eax == INVALID_HANDLE_VALUE
+	
+		invoke ClearLine, WORKING_AREA_HEIGHT+3
+	
+		invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
+		invoke SetColor, cRed
+		invoke crt_printf, offset szFileNotFound
+		
+		jmp @@Ret
+	
+	.endif
+	
 	
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
 	mov hOut, eax
@@ -643,14 +723,15 @@ ImportImageEvent proc uses ebx esi edi
 	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
 	
 	invoke SetColor, cGreen
-	fn crt_printf, "Picture has been successfully imported from Image1.txt"
+	invoke crt_printf, offset szPictureImported
 	
 	invoke Sleep, 1000
 	invoke PutCursorToPos, 1, WORKING_AREA_HEIGHT+3
 	
 	invoke SetColor, DarkGray
-	fn crt_printf, "Picture has been successfully imported from Image1.txt"	
+	invoke crt_printf, offset szPictureImported
 	
+@@Ret:
 	Ret
 ImportImageEvent endp
 
