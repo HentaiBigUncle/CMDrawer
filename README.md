@@ -4,7 +4,7 @@
 
 **·** Use your mouse (touchpad) to draw ascii-graphics in working area. You can change active symbol for drawing, its size and color in Tools menu.
 
-**·** Clear working area if needed
+**·** Clear working area if neccessary
 
 **·** Export your drawing to .txt file
 
@@ -12,4 +12,5 @@
 
 Current version: 1.4.5
 
-![CMDRAWERYUHU](https://github.com/Mishanya00/CMDrawer/assets/116641987/e0d29122-6bf4-4aa7-9de8-d4d63f34340b)
+![изображение](https://github.com/Mishanya00/CMDrawer/assets/116641987/6ae448d8-b7b4-4212-a925-cf463e502db6)
+
