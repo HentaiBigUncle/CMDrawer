@@ -4,7 +4,7 @@
 
 **·** Use your mouse (touchpad) to draw ascii-graphics in working area. You can change active symbol for drawing, its size and color in Tools menu.
 
-**·** Clear working area if needed
+**·** Clear working area if neccessary
 
 **·** Export your drawing to .txt file
 
