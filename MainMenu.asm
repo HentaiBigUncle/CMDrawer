@@ -43,8 +43,8 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
-	interfaceFontColor			dd			LightGreen
-	interfaceBorderColor		dd			cWhite
+	interfaceFontColor			dd			cYellow
+	interfaceBorderColor		dd			LightGray
 
 	szEmptyLine				db		WORKING_AREA_WIDTH		dup(32), 0
 
