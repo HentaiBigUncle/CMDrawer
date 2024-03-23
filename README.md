@@ -1,4 +1,4 @@
-**CMDrawer** - CMDrawer is a simple paint-like console program made with Microsoft Assembly Language (masm32).
+**CMDrawer** - CMDrawer is a simple paint-like console program to create ASCII graphics made with Microsoft Assembly Language (masm32).
 
 **Features:**
 
@@ -7,6 +7,8 @@
 **·** Clear working area if neccessary
 
 **·** Export your drawing to .txt file
+
+**.** Import your drawings from files
 
 **·** Use some other tools
 
