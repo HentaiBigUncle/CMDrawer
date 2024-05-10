@@ -5,8 +5,8 @@ option casemap :none
 include \masm32\include\kernel32.inc	; Basement
 include \masm32\include\windows.inc		; API for console, etc
 include \masm32\include\msvcrt.inc		; C-funcs (may be I will write mine instead)
-include \masm32\include\winmm.inc
-include \masm32\include\user32.inc
+include \masm32\include\winmm.inc		; multimedia lib
+include \masm32\include\user32.inc		
 
 include \masm32\macros\macros.asm
 
@@ -143,6 +143,8 @@ ClearLogArea					proto
 	szBuffer2				db			256			dup(0)
 		
 	screenSize		RECT		<0,0,0,0>
+	
+	clickDone		db		0
 	
 	; DRAWING
 	szToDraw	db		    2	dup(0)

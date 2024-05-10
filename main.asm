@@ -192,20 +192,27 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 		
 	.elseif eax == MOUSE_EVENT
 	
+		mov eax, ConsoleRecord.MouseEvent.dwMousePosition
+		mov ebx, eax
+		shr ebx, 16		; Y coord
+		cwde			; X coord in ax
+	
 		.if ConsoleRecord.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED
-		
-			mov eax, ConsoleRecord.MouseEvent.dwMousePosition
-			mov ebx, eax
-			shr ebx, 16		; Y coord
-			cwde			; X coord in ax
-
+			
+			mov	byte ptr[clickDone], 1
+			
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
 				
 				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				
+			.endif
+			
+		.elseif	byte ptr[clickDone] == 1
+			
+			mov byte ptr[clickDone], 0
 			
 			; FIRST ROW OF BRUSHES
-				
-			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 3 && bx < 6
+			.if ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 3 && bx < 6
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick			
 				mov byte ptr[szToDraw], exclBrush
