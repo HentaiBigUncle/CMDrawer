@@ -130,7 +130,7 @@ ClearLogArea					proto
 	szGetFileName				db			"Enter file name: ", 0
 	szPictureExportedOld		db			"Picture saved to image.txt. Be Careful, you can save ONLY 1 picture at the moment", 0
 	szPictureExported			db			"Picture has been successfully saved! Be careful, you can rewrite existing files.", 0
-	szPictureImported			db			"Picture has been successfully imported from Image1.txt", 0
+	szPictureImported			db			"Picture has been successfully imported!", 0
 	szFileNotFound 				db			"No .txt file with such name. Try again.", 0
 	szClearLine					db			"          ", 0  ; 10 spaces
 	
