@@ -12,7 +12,7 @@
 
 **·** Use some other tools
 
-Current version: 1.5.3
+Current version: 1.5.5
 
 ![изображение](https://github.com/Mishanya00/CMDrawer/assets/116641987/6ae448d8-b7b4-4212-a925-cf463e502db6)
 
