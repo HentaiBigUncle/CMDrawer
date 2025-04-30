@@ -95,7 +95,8 @@ ClearLogArea					proto
 	commaBrush		equ		44
 	minusBrush		equ		45
 	
-	dotBrush		equ		46
+	dotBrush equ 'M'   ; richen:將dotBrush他改成M
+
 	slashBrush		equ		47
 	colonBrush		equ		58
 	semicolonBrush	equ		59

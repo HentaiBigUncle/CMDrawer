@@ -1,5 +1,5 @@
 include main.inc
-include MainMenu.asm
+include MainMenu.asm	
 
 .code
 start:
