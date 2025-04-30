@@ -177,6 +177,66 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	Ret
 DrawCell endp
 
+ DrawSquare proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+
+	LOCAL localCoord: DWORD
+
+	; 設定顏色
+	invoke SetColor, dword ptr[drawColor]
+
+	; 取得中心點座標 → 推算左上角的起始點
+	mov eax, dwCoord
+	mov ecx, eax
+	and ecx, 0FFFFh       ; ECX = X
+	mov edx, eax
+	shr edx, 16           ; EDX = Y
+
+	sub ecx, 2            ; X - 2
+	sub edx, 2            ; Y - 2
+
+	shl edx, 16
+	or ecx, edx           ; 將 Y<<16 | X 組合成 DWORD
+	mov localCoord, ecx   ; 存入起始座標
+
+
+	; ===================
+	; 橫向輸出一列字元
+	; ===================
+
+	lea esi, szBrushBuffer
+	mov ebx, 0
+
+	mov ecx, 0  ; 為了記錄 cx 寬度邊界比較
+
+.while ebx < 5 && ecx < WORKING_AREA_WIDTH
+	mov al, byte ptr[szToDraw]
+	mov byte ptr[esi], al
+	inc ebx
+	inc esi
+	inc ecx
+.endw
+
+	mov byte ptr[esi], 0   ; null terminator
+
+	; ====================
+	; 垂直列印多行字元列
+	; ====================
+
+	mov ebx, 0
+	mov eax, localCoord
+
+.while ebx < 5
+	invoke SetConsoleCursorPosition, hOut, eax
+	invoke crt_printf, offset szBrushBuffer
+
+	add eax, 65536    ; Y++
+	inc ebx
+.endw
+
+	ret
+DrawSquare endp
+
+
 
 KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 
@@ -203,8 +263,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
 				
-				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
-				
+				;invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+
 			.endif
 			
 		.elseif	byte ptr[clickDone] == 1
