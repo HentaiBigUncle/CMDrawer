@@ -1,4 +1,4 @@
-
+; 以下prototype 的procedure 會在 main.asm 做功能的定義
 
 MenuCreate				proto
 LogoCreate				proto
@@ -6,7 +6,7 @@ DrawAreaCreate			proto
 ToolsAreaCreate			proto
 SizeAndColorToolCreate	proto
 ExtraInfoAreaCreate		proto
-CreateButton			proto		:BYTE, :DWORD, :DWORD
+CreateButton			proto		:BYTE, :DWORD, :DWORD ; procedure的定義，BYTE, DWORD, DWORD 是要傳進去的 arguments
 ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
 SpecialButtonsCreate	proto
 ColoredSquareCreate		proto		:DWORD, :DWORD, :DWORD
@@ -19,16 +19,16 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 
 
 .const
-	
+	; equ = equal (ex. label = value 與 label equ value 相等)
 	WORKING_AREA_WIDTH		equ			120
 	WORKING_AREA_HEIGHT		equ			40
 	
-	TOOLS_AREA_WIDTH		equ			32	; TOOLS_AREA_HEIGHT = WORKING_AREA_HEIGHT
+	TOOLS_AREA_WIDTH		equ			32	; TOOLS_AREA_HEIGHT = WORKING_AREA_HEIGHT = 40
 	
 	
 	
 .data
-
+	; db stand for define byte, 
 	szProgramName			db			"CMD DRAWER aka CMDrawer", 0
 	szToolsArea				db			"TOOLS", 0
 	szClearButtonText		db			"Clear", 0
@@ -43,8 +43,9 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
-	interfaceFontColor			dd			cYellow
-	interfaceBorderColor		dd			LightGray
+	; dd stand for define double word
+	interfaceFontColor			dd			cYellow ; define in main.inc
+	interfaceBorderColor		dd			LightGray ; define in main.inc
 
 	szEmptyLine				db		WORKING_AREA_WIDTH		dup(32), 0
 
@@ -63,7 +64,7 @@ MenuCreate endp
 
 LogoCreate proc uses ecx esi edi
 	
-	LOCAL hOut: DWORD
+	LOCAL hOut: DWORD ; a local variable hOut , type is DWORD; hOut stand for handle output
 	
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
 	mov hOut, eax
@@ -186,7 +187,7 @@ VerticalBorderConstruct proc uses ecx ebx esi edi count:DWORD, xCor: DWORD, yCor
 	.while ebx < count
 	
 		invoke PutCursorToPos, xCor, yCor
-		fn crt_printf, "|"
+		fn crt_printf, "|" ; c runtime printf function imported from the C runtime library (msvcrt.dll or similar)
 		inc yCor
 		inc ebx
 		
