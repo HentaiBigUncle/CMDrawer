@@ -101,7 +101,7 @@ _wininc_ equ <1>
     pr24 ArgCount(24)
     pr25 ArgCount(25)
 
-; «««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««
+; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ;;;; end macro
 
@@ -18111,9 +18111,9 @@ ELSE
     LPTBBUTTONINFO typedef ptr TBBUTTONINFOA
 ENDIF
 
-; «««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««
+; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ;                        server 2003 extra equates
-; «««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««
+; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ICC_STANDARD_CLASSES             equ 00004000h
 ICC_LINK_CLASS                   equ 00008000h
@@ -24746,7 +24746,7 @@ DBIF_VIEWMODE_NORMAL    equ 0
 DBIF_VIEWMODE_VERTICAL  equ 1
 DBIF_VIEWMODE_FLOATING  equ 2
 DBIF_VIEWMODE_TRANSPARENT equ 4
-COMP_ELEM_ALL equ (COMP_ELEM_TYPE+COMP_ELEM_CHECKED+COMP_ELEM_DIRTY+COMP_ELEM_NOSCROLL+COMP_ELEM_POS_LEFT+COMP_ELEM_SIZE_WIDTH+COMP_ELEM_SIZE_HEIGHT+COMP_ELEM_POS_ZINDEX+COMP_ELEM_SOURCE+COMP_ELEM_FRIENDLYNAME)
+; COMP_ELEM_ALL equ (COMP_ELEM_TYPE+COMP_ELEM_CHECKED+COMP_ELEM_DIRTY+COMP_ELEM_NOSCROLL+COMP_ELEM_POS_LEFT+COMP_ELEM_SIZE_WIDTH+COMP_ELEM_SIZE_HEIGHT+COMP_ELEM_POS_ZINDEX+COMP_ELEM_SOURCE+COMP_ELEM_FRIENDLYNAME)
 
 CFSTR_SHELLIDLIST       equ TEXT("Shell IDList Array")
 CFSTR_SHELLIDLISTOFFSET equ TEXT("Shell Object Offsets")
@@ -26888,12 +26888,12 @@ FlatnessDefault EQU 0.25
 
 include winextra.inc
 
-; «««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««
+; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ; It is not recomended that WINDOWS.INC be modified but if you need to add
 ; equates or structures to WINDOWS.INC, do not write anything after the
 ; following conditional assembly directive that display the duplicate
 ; warning or it will be duplicated if the file is included more than once.
-; «««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««««
+; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 ELSE
 echo ------------------------------------------
