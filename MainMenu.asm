@@ -1,4 +1,4 @@
-; 以下prototype 的procedure 會在 main.asm 做功能的定義
+
 
 MenuCreate				proto
 LogoCreate				proto
@@ -37,8 +37,8 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szEraserButtonText      db			"Eraser", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
-	szProgramVersion		db			"CMDrawer Version 1.5.5", 0
-	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
+	szProgramVersion		db			"CMDrawer", 0
+	szAuthor				db			"Changed by Our Team", 0
 	szThreeSpaces			db			"   ", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
@@ -98,7 +98,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
 	mov hOut, eax
-	
+	; 打造右邊的邊框
 	invoke HorizontalBorderConstruct, 32, WORKING_AREA_WIDTH+2, 0
 	invoke HorizontalBorderConstruct, 32, WORKING_AREA_WIDTH+2, 2
 	invoke HorizontalBorderConstruct, TOOLS_AREA_WIDTH, WORKING_AREA_WIDTH+2, WORKING_AREA_HEIGHT+1
@@ -123,7 +123,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, commaBrush, WORKING_AREA_WIDTH+23, 6
 	invoke ButtonCreate2, minusBrush, WORKING_AREA_WIDTH+28, 6
 
-	invoke ButtonCreate2, dotBrush, WORKING_AREA_WIDTH+3, 9
+	invoke ButtonCreate2, MBrush, WORKING_AREA_WIDTH+3, 9
 	invoke ButtonCreate2, slashBrush, WORKING_AREA_WIDTH+8, 9
 	invoke ButtonCreate2, colonBrush, WORKING_AREA_WIDTH+13, 9
 	invoke ButtonCreate2, semicolonBrush, WORKING_AREA_WIDTH+18, 9
@@ -142,7 +142,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, braceOBrush, WORKING_AREA_WIDTH+13, 15
 	invoke ButtonCreate2, directBrush, WORKING_AREA_WIDTH+18, 15
 	invoke ButtonCreate2, braceCBrush, WORKING_AREA_WIDTH+23, 15
-	invoke ButtonCreate2, minusBrush, WORKING_AREA_WIDTH+28, 15
+	invoke ButtonCreate2, tildaBrush, WORKING_AREA_WIDTH+28, 15
 
 	invoke SpecialButtonsCreate
 	Ret

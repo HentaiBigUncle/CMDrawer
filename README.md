@@ -1,4 +1,4 @@
-ml /c /coff main.asm 有main.obj的話就不用這行
+ml /c /coff main.asm 有main.obj的話就不用這行，若沒有，記得環境變數指向的path 要有ml.exe
 
 前置作業
 要在邊輯系統環境變數裡把以下的path新增到環境變數(我有放照片)
