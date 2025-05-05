@@ -37,8 +37,8 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szEraserButtonText      db			"Eraser", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
-	szProgramVersion		db			"CMDrawer Version 1.5.5", 0
-	szAuthor				db			"Created by Michael Budnikov aka Mishanya00", 0
+	szProgramVersion		db			"CMDrawer", 0
+	szAuthor				db			"Changed by Our Team", 0
 	szThreeSpaces			db			"   ", 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
@@ -98,7 +98,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
 	mov hOut, eax
-	
+	; 打造右邊的邊框
 	invoke HorizontalBorderConstruct, 32, WORKING_AREA_WIDTH+2, 0
 	invoke HorizontalBorderConstruct, 32, WORKING_AREA_WIDTH+2, 2
 	invoke HorizontalBorderConstruct, TOOLS_AREA_WIDTH, WORKING_AREA_WIDTH+2, WORKING_AREA_HEIGHT+1

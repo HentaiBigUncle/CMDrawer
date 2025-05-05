@@ -12,7 +12,7 @@ start:
 	
 	invoke ExitProcess, 0
 	
-Main proc	uses ebx ecx esi edi
+Main proc  uses ebx ecx esi edi
 	
 	LOCAL hIn: DWORD
 	LOCAL hOut: DWORD
@@ -249,12 +249,40 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 	.endif
 	
 	.if eax == KEY_EVENT
-		
+		        ; Get pointer to KEY_EVENT_RECORD structure
+        movzx ecx, ConsoleRecord.KeyEvent.bKeyDown
+        .if ecx != 0    ; Check if key is pressed (not released)
+
+            movzx ecx, ConsoleRecord.KeyEvent.uChar.AsciiChar
+            ; now ecx contains the ASCII character of the key pressed
+
+            ; Example: if user presses 'c' key, clear screen
+            .if ecx == 'c'
+                invoke ClearPaint
+                invoke PlaySoundOnClick, offset szPlayOnClick
+
+            ; Example: if user presses 'e', export image
+            .elseif ecx == 'e'
+                invoke ExportImageEvent
+                invoke PlaySoundOnClick, offset szPlayOnClick
+
+            ; Example: if user presses 'i', import image
+            .elseif ecx == 'i'
+                invoke ImportImageEvent
+                invoke ClearBuffer, offset szBuffer2, 256
+                invoke PlaySoundOnClick, offset szPlayOnClick
+
+            ; Example: if user presses 'x', exit program
+            .elseif ecx == 'x'
+                invoke ExitProcess, 0
+            .endif
+        .endif
+
 	.elseif eax == MOUSE_EVENT
 	
-		mov eax, ConsoleRecord.MouseEvent.dwMousePosition
+		mov eax, ConsoleRecord.MouseEvent.dwMousePosition ; 讀取滑鼠的位置到eax
 		mov ebx, eax
-		shr ebx, 16		; Y coord
+		shr ebx, 16		; Y coord 把eax的最高四個位元移到ebx的bx
 		cwde			; X coord in ax
 	
 		.if ConsoleRecord.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED
@@ -484,7 +512,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			
 			; <<< ---------   COLOR BUTTONS CHECK   ------------- >>>
-			
+			; bx = height
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 21 && bx <= 22
 			
 				mov eax, cBlue
