@@ -1,4 +1,4 @@
-; 以下prototype 的procedure 會在 main.asm 做功能的定義
+
 
 MenuCreate				proto
 LogoCreate				proto

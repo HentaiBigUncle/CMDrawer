@@ -78,10 +78,11 @@ ClearLogArea					proto
 	cBgYellow			= 0e0h
 	cBgWhite			= 0f0h
 	
-;	BRUSHES:
+;	BRUSHES: 			; 以下對照ASCII code 就可以知道數字代表啥
+
 	eraseBrush  	equ		32		; space
 	
-	exclBrush		equ		33
+	exclBrush		equ		33		
 	quoteBrush      equ		34
 	sharpBrush		equ		35
 	dollarBrush		equ		36

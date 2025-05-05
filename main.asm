@@ -479,7 +479,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 								
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 26 && bx < 29
 			
-				mov byte ptr[drawSize], 8
+				mov byte ptr[drawSize], 9
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			
