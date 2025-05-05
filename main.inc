@@ -6,8 +6,8 @@ include \masm32\include\kernel32.inc	; Basement
 include \masm32\include\windows.inc		; API for console, etc
 include \masm32\include\msvcrt.inc		; C-funcs (may be I will write mine instead)
 include \masm32\include\winmm.inc		; multimedia lib
-include \masm32\include\user32.inc		
-
+include \masm32\include\user32.inc
+include	\masm32\include\masm32.inc
 include \masm32\macros\macros.asm
 
 includelib \masm32\lib\kernel32.lib
@@ -96,7 +96,7 @@ ClearLogArea					proto
 	commaBrush		equ		44
 	minusBrush		equ		45
 	
-	dotBrush equ 'M'   ; richen:將dotBrush他改成M
+	MBrush equ 'M'   ; richen:將dotBrush他改成M
 
 	slashBrush		equ		47
 	colonBrush		equ		58
@@ -117,8 +117,6 @@ ClearLogArea					proto
 	directBrush		equ		124
 	braceCBrush		equ		125
 	tildaBrush		equ		126
-	
-	
 
 .data	
 	ConsoleRecord			INPUT_RECORD	<>

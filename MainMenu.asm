@@ -123,7 +123,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, commaBrush, WORKING_AREA_WIDTH+23, 6
 	invoke ButtonCreate2, minusBrush, WORKING_AREA_WIDTH+28, 6
 
-	invoke ButtonCreate2, dotBrush, WORKING_AREA_WIDTH+3, 9
+	invoke ButtonCreate2, MBrush, WORKING_AREA_WIDTH+3, 9
 	invoke ButtonCreate2, slashBrush, WORKING_AREA_WIDTH+8, 9
 	invoke ButtonCreate2, colonBrush, WORKING_AREA_WIDTH+13, 9
 	invoke ButtonCreate2, semicolonBrush, WORKING_AREA_WIDTH+18, 9
@@ -142,7 +142,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, braceOBrush, WORKING_AREA_WIDTH+13, 15
 	invoke ButtonCreate2, directBrush, WORKING_AREA_WIDTH+18, 15
 	invoke ButtonCreate2, braceCBrush, WORKING_AREA_WIDTH+23, 15
-	invoke ButtonCreate2, minusBrush, WORKING_AREA_WIDTH+28, 15
+	invoke ButtonCreate2, tildaBrush, WORKING_AREA_WIDTH+28, 15
 
 	invoke SpecialButtonsCreate
 	Ret
