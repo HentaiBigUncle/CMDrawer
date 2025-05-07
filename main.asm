@@ -523,7 +523,8 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			.elseif al == 'E' || al == 'e'
 		
-				mov eax, cBlack
+				mov byte ptr[szToDraw], ' '         ; 設定要畫的字為空白
+				mov eax, interfaceBorderColor       ; 回復成預設邊框色
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
 		.endif
@@ -931,7 +932,8 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
 		
-				mov eax, cBlack
+				mov byte ptr[szToDraw], ' '
+				mov eax, interfaceBorderColor
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
 					
