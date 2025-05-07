@@ -25,7 +25,7 @@ Main proc  uses ebx ecx esi edi
 	mov hIn, eax
 	invoke GetStdHandle, STD_OUTPUT_HANDLE
 	mov hOut, eax
-	
+	invoke InitConsoleHandle
 	invoke GetConsoleWindow
 	invoke ShowScrollBar, eax, SB_BOTH, FALSE
 	invoke HideCursor
@@ -139,6 +139,112 @@ SetWindowSize proc uses ebx esi edi wd:DWORD, ht:DWORD
 	Ret
 SetWindowSize endp
 
+; 初始化 console handle
+InitConsoleHandle PROC
+    invoke GetStdHandle, STD_OUTPUT_HANDLE
+    mov hConsoleOutput, eax
+    ret
+InitConsoleHandle ENDP
+
+; 儲存畫面區塊到 CanvasHistory[HistoryCount]
+SaveToHistory PROC
+    LOCAL bufferSize: COORD
+    LOCAL bufferCoord: COORD
+    LOCAL readRegion: SMALL_RECT
+    LOCAL offsetDest: DWORD
+
+    cmp HistoryCount, MAX_HISTORY_COUNT
+    jge ExitSave
+
+    ; 設定讀取區塊大小與位置
+    mov bufferSize.x, HISTORY_WIDTH
+    mov bufferSize.y, HISTORY_HEIGHT 
+    mov bufferCoord.x, 1
+    mov bufferCoord.y, 3
+
+    ; 設定從 Console 左上角區塊 (0,0)-(9,4)
+    mov readRegion.Left, 1
+    mov readRegion.Top, 3
+    mov readRegion.Right, HISTORY_WIDTH + 1
+    mov readRegion.Bottom, HISTORY_HEIGHT + 3
+
+    ; 讀取目前畫面
+	
+    invoke ReadConsoleOutput, hConsoleOutput, addr tempBuffer, bufferSize, bufferCoord, addr readRegion
+
+    ; 複製到 CanvasHistory[HistoryCount]
+    mov eax, HistoryCount
+    imul eax, HISTORY_SIZE
+    imul eax, SIZEOF CHAR_INFO
+    mov offsetDest, eax
+    lea edi, CanvasHistory
+    add edi, offsetDest
+    lea esi, tempBuffer
+    mov ecx, HISTORY_SIZE
+copyloop:
+    mov eax, [esi]
+    mov [edi], eax
+    add esi, SIZEOF CHAR_INFO
+    add edi, SIZEOF CHAR_INFO
+    loop copyloop
+
+    ; 更新紀錄
+    inc HistoryCount
+    mov eax, HistoryCount
+    mov CurrentIndex, eax
+
+ExitSave:
+    ret
+SaveToHistory ENDP
+
+; 從 CanvasHistory 還原畫面
+UndoCanvas PROC
+    LOCAL bufferSize: COORD
+    LOCAL bufferCoord: COORD
+    LOCAL writeRegion: SMALL_RECT
+    LOCAL offsetSrc: DWORD
+
+    cmp HistoryCount, 0
+    jle ExitUndo
+
+    dec CurrentIndex
+    dec HistoryCount
+
+    ; 從 CanvasHistory[CurrentIndex] 複製到 tempBuffer
+    mov eax, CurrentIndex
+    imul eax, HISTORY_SIZE
+    imul eax, SIZEOF CHAR_INFO
+    mov offsetSrc, eax
+    lea esi, CanvasHistory
+    add esi, offsetSrc
+    lea edi, tempBuffer
+    mov ecx, HISTORY_SIZE
+copyback:
+    mov eax, [esi]
+    mov [edi], eax
+    add esi, SIZEOF CHAR_INFO
+    add edi, SIZEOF CHAR_INFO
+    loop copyback
+
+    ; 設定寫入區塊大小與位置
+    mov bufferSize.x, HISTORY_WIDTH
+    mov bufferSize.y, HISTORY_HEIGHT
+    mov bufferCoord.x, 1
+    mov bufferCoord.y, 3
+
+    mov writeRegion.Left, 1
+    mov writeRegion.Top, 3
+    mov writeRegion.Right, HISTORY_WIDTH + 1
+    mov writeRegion.Bottom, HISTORY_HEIGHT + 3
+
+    ; 寫入畫面
+    invoke WriteConsoleOutput, hConsoleOutput, addr tempBuffer, bufferSize, bufferCoord, addr writeRegion
+
+ExitUndo:
+    ret
+UndoCanvas ENDP
+
+
 DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	
 	invoke SetColor, dword ptr[drawColor]
@@ -247,9 +353,11 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 	
 	.if eax == KEY_EVENT
 		movzx eax, byte ptr ConsoleRecord.KeyEvent + 0Ah ; Get the ASCII character from KeyEvent.uChar.AsciiChar
-			
+		; 迴車鍵
+		.if al == 'Z' or 'z'
+			invoke UndoCanvas
 		; FIRST ROW OF BRUSHES
-		.if al == '!'
+		.elseif al == '!'
 			invoke PlaySoundOnClick, offset szPlayOnClick			
 				mov byte ptr[szToDraw], exclBrush
 				mov eax, cWhite
@@ -536,7 +644,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 		.if ConsoleRecord.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED
 			
 			mov	byte ptr[clickDone], 1
-			
+			invoke SaveToHistory
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
 				
 				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]

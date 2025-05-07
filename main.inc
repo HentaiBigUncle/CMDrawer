@@ -27,16 +27,22 @@ SetColor						proto		    :DWORD
 PlaySoundOnClick				proto			:DWORD
 DrawCell						proto  			:DWORD, :DWORD
 
+SaveGoBack						proto  			:DWORD ;紀錄上一步做了什麼
+GoBack							proto 			:DWORD, :DWORD
+DoneGoBack						proto 		;當沒有儲存任何東西在UndoStackTop時，會到這裡
 KeyController					proto			:DWORD, :DWORD
-
+SaveCanvasSnapshot				proto
+RedrawCanvas					proto			:DWORD, :DWORD
 ExportImageEvent				proto
 ImportImageEvent 				proto
 
 ClearBuffer						proto			:DWORD, :DWORD
-
+SaveToHistory					proto
+UndoCanvas						proto
 GetInput						proto			:DWORD, :DWORD
 ClearLine						proto			:DWORD
 ClearLogArea					proto
+InitConsoleHandle				proto
 
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
@@ -44,6 +50,17 @@ ClearLogArea					proto
 	
 	MAX_WIDTH				equ			150
 	MAX_HEIGHT				equ			50
+
+	WORKING_AREA_WIDTH		equ			120
+	WORKING_AREA_HEIGHT		equ			40
+
+	HISTORY_WIDTH     equ 120
+	HISTORY_HEIGHT    equ 40
+	HISTORY_SIZE      equ HISTORY_WIDTH * HISTORY_HEIGHT
+	MAX_HISTORY_COUNT equ 100
+
+	
+
 	; COLORS
 	cBlack				= 0
 	cBlue				= 1
@@ -118,6 +135,17 @@ ClearLogArea					proto
 	braceCBrush		equ		125
 	tildaBrush		equ		126
 
+	; Undo
+	MAX_UNDO_COUNT equ 100
+.data?
+	CanvasHistory     CHAR_INFO HISTORY_SIZE * MAX_HISTORY_COUNT dup(<>)
+	HistoryCount      DWORD ?
+	CurrentIndex      DWORD ?
+	; console API handle
+	hConsoleOutput    HANDLE ?
+	; Temp buffer
+	tempBuffer        CHAR_INFO HISTORY_SIZE dup(<>)
+	
 .data	
 	ConsoleRecord			INPUT_RECORD	<>
 	
@@ -150,6 +178,3 @@ ClearLogArea					proto
 	szToDraw	db		    2	dup(0)
 	drawSize	dd			1
 	drawColor	dd			cWhite
-	
-	
-	
