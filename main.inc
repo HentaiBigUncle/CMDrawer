@@ -148,7 +148,7 @@ InitConsoleHandle				proto
 	
 .data	
 	ConsoleRecord			INPUT_RECORD	<>
-	
+	  
 	hWnd		dd			0
 	hFile		dd			0
 	
@@ -178,3 +178,5 @@ InitConsoleHandle				proto
 	szToDraw	db		    2	dup(0)
 	drawSize	dd			1
 	drawColor	dd			cWhite
+	; 迴車鑑
+	prevButtonState dd 0	

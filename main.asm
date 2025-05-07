@@ -170,7 +170,7 @@ SaveToHistory PROC
 
     ; 讀取目前畫面
 	
-    invoke ReadConsoleOutput, hConsoleOutput, addr tempBuffer, bufferSize, bufferCoord, addr readRegion
+    invoke ReadConsoleOutput, hConsoleOutput, addr tempBuffer, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr readRegion
 
     ; 複製到 CanvasHistory[HistoryCount]
     mov eax, HistoryCount
@@ -238,7 +238,7 @@ copyback:
     mov writeRegion.Bottom, HISTORY_HEIGHT + 3
 
     ; 寫入畫面
-    invoke WriteConsoleOutput, hConsoleOutput, addr tempBuffer, bufferSize, bufferCoord, addr writeRegion
+    invoke WriteConsoleOutput, hConsoleOutput, addr tempBuffer, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr writeRegion
 
 ExitUndo:
     ret
@@ -354,7 +354,8 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 	.if eax == KEY_EVENT
 		movzx eax, byte ptr ConsoleRecord.KeyEvent + 0Ah ; Get the ASCII character from KeyEvent.uChar.AsciiChar
 		; 迴車鍵
-		.if al == 'Z' or 'z'
+		.if ConsoleRecord.KeyEvent.bKeyDown && ConsoleRecord.KeyEvent.wRepeatCount == 1
+		.if al == 'z'
 			invoke UndoCanvas
 		; FIRST ROW OF BRUSHES
 		.elseif al == '!'
@@ -606,21 +607,21 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			; CLEAR	
 			
-			.elseif al == 'C' || al == 'c'
+			.elseif al == 'c'
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ClearPaint
 				
 			; EXPORT
 			
-			.elseif al == 'X' || al == 'x'
+			.elseif al == 'x'
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ExportImageEvent
 				
 			; IMPORT	
 			
-			.elseif al == 'I' || al == 'i'
+			.elseif al == 'i'
 			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ImportImageEvent
@@ -634,24 +635,26 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cBlack
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.endif
 		.endif
 		.elseif eax == MOUSE_EVENT
 		mov eax, ConsoleRecord.MouseEvent.dwMousePosition ; 讀取滑鼠的位置到eax
 		mov ebx, eax
 		shr ebx, 16		; Y coord 把eax的最高四個位元移到ebx的bx
 		cwde			; X coord in ax
-	
 		.if ConsoleRecord.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED
 			
 			mov	byte ptr[clickDone], 1
-			invoke SaveToHistory
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
-				
+				.if prevButtonState == 0
+					mov prevButtonState, 1
+					invoke SaveToHistory
+				.endif
 				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 
 			.endif
-			
+		
 		.elseif	byte ptr[clickDone] == 1
 			
 			mov byte ptr[clickDone], 0
@@ -1044,7 +1047,8 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				invoke PlaySoundOnClick, offset szPlayOnClick
 					
 			.endif
-			
+				 ; 儲存本次狀態供下次比對
+    			mov prevButtonState, 0
 			
 			;		invoke Sleep, densityBrush  Idea for regulation of brushes' density
 			
