@@ -666,7 +666,10 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 				invoke ClearBuffer, offset szBuffer2, 256
 			; ERASER	
+<<<<<<< HEAD
 			
+=======
+>>>>>>> d2d570f9bb9a5e905195dfffe9d16066796063f1
 			.elseif al == 'E' || al == 'e'
 				mov isEraser, 1
 				mov byte ptr[szToDraw], ' '         ; 設定要畫的字為空白
@@ -1077,7 +1080,11 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; ERASER	
 			
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
+<<<<<<< HEAD
 		    	mov isEraser, 1
+=======
+		    mov isEraser, 1
+>>>>>>> d2d570f9bb9a5e905195dfffe9d16066796063f1
 				mov byte ptr[szToDraw], ' '
 				mov eax, interfaceBorderColor
 				mov dword ptr[drawColor], eax
