@@ -40,6 +40,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szProgramVersion		db			"CMDrawer", 0
 	szAuthor				db			"Changed by Our Team", 0
 	szThreeSpaces			db			"   ", 0
+	EraserBrush 			db 			' ', 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
