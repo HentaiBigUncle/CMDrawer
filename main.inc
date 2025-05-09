@@ -44,7 +44,9 @@ GetInput						proto			:DWORD, :DWORD
 ClearLine						proto			:DWORD
 ClearLogArea					proto
 InitConsoleHandle				proto
-ShowBrushStatus					proto 			
+ShowBrushStatus					proto 		
+ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
+
 .const
 	HORIZONTAL_BORDER_LENGTH	equ		123
 	VERTICAL_BORDER_LENGTH		equ		81
@@ -183,5 +185,6 @@ ShowBrushStatus					proto
 	prevButtonState dd 0	
 	; 判斷是否為橡皮擦
 	isEraser       dd  0
+	isPicker        db 0
 	strEraser		db "[Eraser]: Size %d ", 0
 	fmtBrushStatus db  " [brush]: Size %d", 0

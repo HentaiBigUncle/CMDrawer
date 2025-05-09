@@ -1,6 +1,7 @@
 include main.inc
 include MainMenu.asm	
 
+
 .code
 start:
 	
@@ -360,6 +361,11 @@ ShowBrushStatus proc uses eax ebx ecx edx
         invoke SetColor, LightGray
         invoke crt_sprintf, addr buffer, offset strEraser, drawSize
 		invoke WriteConsoleA, hOut, addr buffer, 18, addr written, 0
+	
+	.elseif isPicker == 1
+        invoke SetColor, LightGray
+        invoke crt_printf, offset szPickerButtonText
+	
     .else
         ; 顏色的brush
 		invoke SetColor, dword ptr[drawColor]
@@ -376,8 +382,18 @@ ShowBrushStatus proc uses eax ebx ecx edx
 ShowBrushStatus endp
 
 
-KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 
+
+KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
+	;picker用; === 取得指定位置的背景顏色 ===
+	LOCAL coord: COORD
+	LOCAL attr: WORD
+	LOCAL readed: DWORD
+	LOCAL chi: CHAR_INFO
+	LOCAL bufferSize: COORD
+	LOCAL bufferCoord: COORD
+	LOCAL readRegion: SMALL_RECT
+	;picker用
 	movzx eax, word ptr[ConsoleRecord.EventType]
 	.if eax == 0
 		
@@ -673,8 +689,14 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
-			.endif
+			
 				invoke ShowBrushStatus
+			.elseif al == 'P' || al == 'p'
+				mov isPicker, 1
+				mov isEraser, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
+				invoke ShowBrushStatus
+		.endif	
 		.endif
 		.elseif eax == MOUSE_EVENT
 		mov eax, ConsoleRecord.MouseEvent.dwMousePosition ; 讀取滑鼠的位置到eax
@@ -685,13 +707,34 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			mov	byte ptr[clickDone], 1
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
-				.if prevButtonState == 0
-					mov prevButtonState, 1
-					invoke SaveToHistory
-				.endif
-				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
-				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.if	isPicker == 1	
+					mov isEraser, 0				
+					mov word ptr[coord], ax       ; coord.X
+					mov word ptr[coord+2], bx 
+					mov bufferSize.x, 1
+					mov bufferSize.y, 1
+					mov bufferCoord.x, 0
+					mov bufferCoord.y, 0
 
+					mov readRegion.Left, ax
+					mov readRegion.Top, bx
+					mov readRegion.Right, ax
+					mov readRegion.Bottom, bx
+					invoke ReadConsoleOutput, hOut, addr chi, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr readRegion
+					movzx eax, chi.Attributes
+					and eax, 0Fh
+					mov dword ptr[drawColor], eax
+					mov isPicker, 0
+					
+					invoke ShowBrushStatus
+				.else	
+					.if prevButtonState == 0
+						mov prevButtonState, 1
+						invoke SaveToHistory
+					.endif
+					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.endif
 			.endif
 		
 		.elseif	byte ptr[clickDone] == 1
@@ -1082,7 +1125,13 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, interfaceBorderColor
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
-					
+			; Picker
+
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+17 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
+				mov isPicker, 1
+				mov isEraser, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
+
 			.endif
 				 ; 儲存本次狀態供下次比對
     			mov prevButtonState, 0
