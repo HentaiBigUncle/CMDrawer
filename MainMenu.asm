@@ -10,7 +10,7 @@ CreateButton			proto		:BYTE, :DWORD, :DWORD ; procedure的定義，BYTE, DWORD, 
 ButtonCreate2			proto		:BYTE, :DWORD, :DWORD
 SpecialButtonsCreate	proto
 ColoredSquareCreate		proto		:DWORD, :DWORD, :DWORD
-
+	
 ClearPaint				proto
 
 HorizontalBorderConstruct	proto	:DWORD, :DWORD, :DWORD
