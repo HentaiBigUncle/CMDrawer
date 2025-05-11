@@ -435,19 +435,19 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 		mov isEraser, 0
 		mov isPicker, 0
 		.elseif al == '$'
-			invoke PlaySoundOnClick, offset szPlayOnClick
+				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], dollarBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
-		mov isEraser, 0
-		mov isPicker, 0
+				mov isEraser, 0
+				mov isPicker, 0
 		.elseif al == '&'
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], comAndBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
-		mov isEraser, 0
-		mov isPicker, 0
+				mov isEraser, 0
+				mov isPicker, 0
 		.elseif al == zeroQuoteBrush
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], zeroQuoteBrush
@@ -466,11 +466,11 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			.elseif  al == ')'
 					mov isEraser, 0
+					mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], parenthCBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
-				mov isPicker, 0
 			.elseif  al == '*'
 					mov isEraser, 0
 					mov isPicker, 0
