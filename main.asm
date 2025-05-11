@@ -409,6 +409,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 		.if ConsoleRecord.KeyEvent.bKeyDown && ConsoleRecord.KeyEvent.wRepeatCount == 1
 		.if al == 'z'
 			invoke UndoCanvas
+			mov isReturn, 1
+			mov isEraser, 0
+			mov isPicker, 0
 		; FIRST ROW OF BRUSHES
 		.elseif al == '!'
 			invoke PlaySoundOnClick, offset szPlayOnClick			
@@ -416,39 +419,46 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '"'
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], quoteBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '#'
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], sharpBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '$'
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], dollarBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '&'
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], comAndBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == zeroQuoteBrush
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], zeroQuoteBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		; SECOND ROW OF BRUSHES
 			.elseif al == '('
 					mov isEraser, 0
+					mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], parenthOBrush
 				mov eax, cWhite
@@ -456,6 +466,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			.elseif  al == ')'
 					mov isEraser, 0
+					mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], parenthCBrush
 				mov eax, cWhite
@@ -463,6 +474,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			.elseif  al == '*'
 					mov isEraser, 0
+					mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], multiplBrush
 				mov eax, cWhite
@@ -470,6 +482,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			.elseif  al == '+'
 					mov isEraser, 0
+					mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], plusBrush
 				mov eax, cWhite
@@ -477,6 +490,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			.elseif  al == ','
 					mov isEraser, 0
+					mov isPicker, 0
 				mov byte ptr[szToDraw], commaBrush	
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
@@ -484,6 +498,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				
 			.elseif  al == '-'
 					mov isEraser, 0
+					mov isPicker, 0
 				mov byte ptr[szToDraw], minusBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
@@ -496,6 +511,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '/'
 			
 				mov byte ptr[szToDraw], slashBrush
@@ -503,6 +519,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == ':'
 			
 				mov byte ptr[szToDraw], colonBrush
@@ -510,6 +527,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == ';'
 			
 				mov byte ptr[szToDraw], semicolonBrush
@@ -517,6 +535,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '<'
 			
 				mov byte ptr[szToDraw], lessBrush
@@ -524,8 +543,10 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '='
 					mov isEraser, 0
+					mov isPicker, 0
 				mov byte ptr[szToDraw], equalBrush	
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
@@ -538,6 +559,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '?'
 			
 				mov byte ptr[szToDraw], questionBrush
@@ -545,6 +567,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '@'
 			
 				mov byte ptr[szToDraw], atBrush
@@ -552,6 +575,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '['
 			
 				mov byte ptr[szToDraw], squareOBrush
@@ -559,6 +583,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '\'
 			
 				mov byte ptr[szToDraw], backSlashBrush
@@ -566,8 +591,10 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == ']'
 					mov isEraser, 0
+					mov isPicker, 0
 				mov byte ptr[szToDraw], squareCBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick	
 				mov eax, cWhite
@@ -580,6 +607,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '_'
 			
 				mov byte ptr[szToDraw], traitBrush
@@ -587,6 +615,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '{'
 			
 				mov byte ptr[szToDraw], braceOBrush
@@ -594,6 +623,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '|'
 			
 				mov byte ptr[szToDraw], directBrush
@@ -601,6 +631,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '}'
 			
 				mov byte ptr[szToDraw], braceCBrush
@@ -608,6 +639,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif  al == '~'
 			
 				mov byte ptr[szToDraw], tildaBrush
@@ -615,50 +647,51 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 						mov isEraser, 0
+						mov isPicker, 0
 		; SIZE BUTTONS CHECKS
 			
 			.elseif al == '1'
 			
 				mov byte ptr[drawSize], 1
 				invoke PlaySoundOnClick, offset szPlayOnClick
-				
+				mov isPicker, 0
 			.elseif al == '2'
 			
 				mov byte ptr[drawSize], 2
 				invoke PlaySoundOnClick, offset szPlayOnClick	
-				
+				mov isPicker, 0
 			.elseif al == '3'
 			
 				mov byte ptr[drawSize], 3
 				invoke PlaySoundOnClick, offset szPlayOnClick
-				
+				mov isPicker, 0
 			.elseif al == '4'
 			
 				mov byte ptr[drawSize], 4
 				invoke PlaySoundOnClick, offset szPlayOnClick
-				
+				mov isPicker, 0
 			.elseif al == '5'
 			
 				mov byte ptr[drawSize], 5
 				invoke PlaySoundOnClick, offset szPlayOnClick	
-				
+				mov isPicker, 0
 			.elseif al == '6'
 			
 				mov byte ptr[drawSize], 6
 				invoke PlaySoundOnClick, offset szPlayOnClick
-				
+				mov isPicker, 0
 			.elseif al == '7'
 			
 				mov byte ptr[drawSize], 7
 				invoke PlaySoundOnClick, offset szPlayOnClick
-								
+				mov isPicker, 0				
 			.elseif al == '8'
 			
 				mov byte ptr[drawSize], 8
 				invoke PlaySoundOnClick, offset szPlayOnClick
-								
+				mov isPicker, 0				
 			.elseif al == '9'
-			
+				mov isPicker, 0
 				mov byte ptr[drawSize], 9
 				invoke PlaySoundOnClick, offset szPlayOnClick
 			; SPECIAL BUTTONS CHECKS
@@ -666,7 +699,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; CLEAR	
 			
 			.elseif al == 'c'
-			
+
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ClearPaint
 			; EXPORT
@@ -686,6 +719,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; ERASER	
 			.elseif al == 'E' || al == 'e'
 				mov isEraser, 1
+				mov isPicker, 0
 				mov byte ptr[szToDraw], ' '         ; 設定要畫的字為空白
 				mov eax, interfaceBorderColor       ; 回復成預設邊框色
 
@@ -697,8 +731,8 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov isPicker, 1
 				mov isEraser, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
+		.endif
 				invoke ShowBrushStatus
-		.endif	
 		.endif
 		.elseif eax == MOUSE_EVENT
 		mov eax, ConsoleRecord.MouseEvent.dwMousePosition ; 讀取滑鼠的位置到eax
