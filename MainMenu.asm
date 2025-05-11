@@ -35,11 +35,13 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szExportButtonText		db			"Export", 0
 	szImportButtonText		db			"Import", 0
 	szEraserButtonText      db			"Eraser", 0
+	szPickerButtonText 		db			"Picker             ", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
 	szProgramVersion		db			"CMDrawer", 0
 	szAuthor				db			"Changed by Our Team", 0
 	szThreeSpaces			db			"   ", 0
+	EraserBrush 			db 			' ', 0
 	
 	srect				SMALL_RECT		<0, 0, MAX_WIDTH, MAX_HEIGHT>	; For console buffer
 	
@@ -56,6 +58,7 @@ MenuCreate proc	uses ecx esi edi
 	invoke LogoCreate
 	invoke DrawAreaCreate
 	invoke ToolsAreaCreate
+	invoke SpecialButtonsCreate
 	invoke SizeAndColorToolCreate
 	invoke ExtraInfoAreaCreate
 	
@@ -144,7 +147,6 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, braceCBrush, WORKING_AREA_WIDTH+23, 15
 	invoke ButtonCreate2, tildaBrush, WORKING_AREA_WIDTH+28, 15
 
-	invoke SpecialButtonsCreate
 	Ret
 ToolsAreaCreate endp
 
@@ -278,10 +280,10 @@ SpecialButtonsCreate proc uses ecx esi edi
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	
 	; Import Button Creating
-	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-4
-	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-5
-	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+32, WORKING_AREA_HEIGHT-4
-	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-3
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-4
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+20, WORKING_AREA_HEIGHT-5
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+33, WORKING_AREA_HEIGHT-4
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+20, WORKING_AREA_HEIGHT-3
 	
 	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
 	invoke PutCursorToPos, 142, WORKING_AREA_HEIGHT-4
@@ -298,7 +300,17 @@ SpecialButtonsCreate proc uses ecx esi edi
 	invoke PutCursorToPos, WORKING_AREA_WIDTH+3, WORKING_AREA_HEIGHT-5
 	invoke crt_printf, offset szEraserButtonText
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
-			
+	; Picker Button Creating
+
+	invoke VerticalBorderConstruct, 3, WORKING_AREA_WIDTH+10, WORKING_AREA_HEIGHT-6
+	invoke HorizontalBorderConstruct, 6, WORKING_AREA_WIDTH+11, WORKING_AREA_HEIGHT-7
+	invoke VerticalBorderConstruct, 3, WORKING_AREA_WIDTH+17, WORKING_AREA_HEIGHT-6
+	invoke HorizontalBorderConstruct, 6, WORKING_AREA_WIDTH+11, WORKING_AREA_HEIGHT-3
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, WORKING_AREA_WIDTH+11, WORKING_AREA_HEIGHT-5
+	invoke crt_printf, offset szPickerButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	Ret
 SpecialButtonsCreate endp
 

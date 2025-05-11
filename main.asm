@@ -1,6 +1,7 @@
 include main.inc
 include MainMenu.asm	
 
+
 .code
 start:
 	
@@ -165,8 +166,8 @@ SaveToHistory PROC
     ; 設定從 Console 左上角區塊 (0,0)-(9,4)
     mov readRegion.Left, 1
     mov readRegion.Top, 3
-    mov readRegion.Right, HISTORY_WIDTH + 2
-    mov readRegion.Bottom, HISTORY_HEIGHT + 4
+    mov readRegion.Right, HISTORY_WIDTH + 1
+    mov readRegion.Bottom, HISTORY_HEIGHT + 3
 
     ; 讀取目前畫面
 	
@@ -234,8 +235,8 @@ copyback:
 
     mov writeRegion.Left, 1
     mov writeRegion.Top, 3
-    mov writeRegion.Right, HISTORY_WIDTH + 2
-    mov writeRegion.Bottom, HISTORY_HEIGHT + 4
+    mov writeRegion.Right, HISTORY_WIDTH + 1
+    mov writeRegion.Bottom, HISTORY_HEIGHT + 3
 
     ; 寫入畫面
     invoke WriteConsoleOutput, hConsoleOutput, addr tempBuffer, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr writeRegion
@@ -360,6 +361,13 @@ ShowBrushStatus proc uses eax ebx ecx edx
         invoke SetColor, LightGray
         invoke crt_sprintf, addr buffer, offset strEraser, drawSize
 		invoke WriteConsoleA, hOut, addr buffer, 18, addr written, 0
+	
+	.elseif isPicker == 1
+        invoke SetColor, LightGray
+        invoke crt_printf, offset szPickerButtonText
+	.elseif isReturn == 1
+		invoke SetColor, LightGray
+        invoke crt_printf, offset strReturn
     .else
         ; 顏色的brush
 		invoke SetColor, dword ptr[drawColor]
@@ -376,8 +384,18 @@ ShowBrushStatus proc uses eax ebx ecx edx
 ShowBrushStatus endp
 
 
-KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 
+
+KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
+	;picker用; === 取得指定位置的背景顏色 ===
+	LOCAL coord: COORD
+	LOCAL attr: WORD
+	LOCAL readed: DWORD
+	LOCAL chi: CHAR_INFO
+	LOCAL bufferSize: COORD
+	LOCAL bufferCoord: COORD
+	LOCAL readRegion: SMALL_RECT
+	;picker用
 	movzx eax, word ptr[ConsoleRecord.EventType]
 	.if eax == 0
 		
@@ -391,6 +409,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 		.if ConsoleRecord.KeyEvent.bKeyDown && ConsoleRecord.KeyEvent.wRepeatCount == 1
 		.if al == 'z'
 			invoke UndoCanvas
+			mov isReturn, 1
+			mov isEraser, 0
+			mov isPicker, 0
 		; FIRST ROW OF BRUSHES
 		.elseif al == '!'
 			invoke PlaySoundOnClick, offset szPlayOnClick			
@@ -398,39 +419,46 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '"'
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], quoteBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '#'
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], sharpBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '$'
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], dollarBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == '&'
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], comAndBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		.elseif al == zeroQuoteBrush
 			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], zeroQuoteBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		mov isEraser, 0
+		mov isPicker, 0
 		; SECOND ROW OF BRUSHES
 			.elseif al == '('
 					mov isEraser, 0
+					mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], parenthOBrush
 				mov eax, cWhite
@@ -442,226 +470,226 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov byte ptr[szToDraw], parenthCBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
-				
+				mov isPicker, 0
 			.elseif  al == '*'
 					mov isEraser, 0
-				invoke PlaySoundOnClick, offset szPlayOnClick
+					mov isPicker, 0
 				mov byte ptr[szToDraw], multiplBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 				
 			.elseif  al == '+'
 					mov isEraser, 0
-				invoke PlaySoundOnClick, offset szPlayOnClick
+					mov isPicker, 0
 				mov byte ptr[szToDraw], plusBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 				
 			.elseif  al == ','
 					mov isEraser, 0
+					mov isPicker, 0
 				mov byte ptr[szToDraw], commaBrush	
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 				
 			.elseif  al == '-'
 					mov isEraser, 0
 				mov byte ptr[szToDraw], minusBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+					mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 		; THIRD ROW OF BRUSHES
 		.elseif al == 'M'
-			
+					mov isPicker, 0
 				mov byte ptr[szToDraw], MBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+	
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '/'
 			
 				mov byte ptr[szToDraw], slashBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == ':'
 			
 				mov byte ptr[szToDraw], colonBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == ';'
 			
 				mov byte ptr[szToDraw], semicolonBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '<'
 			
 				mov byte ptr[szToDraw], lessBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 						mov isEraser, 0
 			.elseif  al == '='
 					mov isEraser, 0
 				mov byte ptr[szToDraw], equalBrush	
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 		; FORTH ROW OF BRUSHES
 		.elseif  al == '>'
-			
+				mov isPicker, 0
 				mov byte ptr[szToDraw], moreBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '?'
 			
 				mov byte ptr[szToDraw], questionBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '@'
 			
 				mov byte ptr[szToDraw], atBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '['
 			
 				mov byte ptr[szToDraw], squareOBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
-				mov eax, cWhite
+				mov isPicker, 0
+					mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '\'
 			
 				mov byte ptr[szToDraw], backSlashBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == ']'
 					mov isEraser, 0
 				mov byte ptr[szToDraw], squareCBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 		; FIFTH ROW OF BRUSHES
 		.elseif  al == '^'
 			
 				mov byte ptr[szToDraw], birdBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '_'
 			
 				mov byte ptr[szToDraw], traitBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '{'
 			
 				mov byte ptr[szToDraw], braceOBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
-				mov eax, cWhite
+				mov isPicker, 0
+				mov eax, cWhite		
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '|'
 			
 				mov byte ptr[szToDraw], directBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '}'
 			
 				mov byte ptr[szToDraw], braceCBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif  al == '~'
 			
 				mov byte ptr[szToDraw], tildaBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 						mov isEraser, 0
 		; SIZE BUTTONS CHECKS
 			
 			.elseif al == '1'
-			
+
 				mov byte ptr[drawSize], 1
-				invoke PlaySoundOnClick, offset szPlayOnClick
-				
+
+				mov isPicker, 0
 			.elseif al == '2'
 			
 				mov byte ptr[drawSize], 2
-				invoke PlaySoundOnClick, offset szPlayOnClick	
-				
+
+				mov isPicker, 0
 			.elseif al == '3'
 			
 				mov byte ptr[drawSize], 3
-				invoke PlaySoundOnClick, offset szPlayOnClick
-				
+
+				mov isPicker, 0
 			.elseif al == '4'
 			
 				mov byte ptr[drawSize], 4
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				
 			.elseif al == '5'
 			
 				mov byte ptr[drawSize], 5
-				invoke PlaySoundOnClick, offset szPlayOnClick	
-				
+
+						mov isPicker, 0
 			.elseif al == '6'
 			
 				mov byte ptr[drawSize], 6
-				invoke PlaySoundOnClick, offset szPlayOnClick
-				
-			.elseif al == '7'
+				mov isPicker, 0
+			.elseif al == '7'	
 			
 				mov byte ptr[drawSize], 7
-				invoke PlaySoundOnClick, offset szPlayOnClick
+					mov isPicker, 0
 								
 			.elseif al == '8'
 			
 				mov byte ptr[drawSize], 8
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 								
 			.elseif al == '9'
 			
 				mov byte ptr[drawSize], 9
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 			; SPECIAL BUTTONS CHECKS
 			
 			; CLEAR	
 			
 			.elseif al == 'c'
-			
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
+
 				invoke ClearPaint
 			; EXPORT
 			
 			.elseif al == 'x'
 			
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				invoke ExportImageEvent
 			; IMPORT	
 			
 			.elseif al == 'i'
 			
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				invoke ImportImageEvent
 				
 				invoke ClearBuffer, offset szBuffer2, 256
@@ -672,10 +700,17 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov eax, interfaceBorderColor       ; 回復成預設邊框色
 
 				mov dword ptr[drawColor], eax
-				invoke PlaySoundOnClick, offset szPlayOnClick
-			.endif
-				invoke ShowBrushStatus
+				mov isPicker, 0
+			
+			.elseif al == 'P' || al == 'p'
+				mov isPicker, 1
+				mov isEraser, 0
+
 		.endif
+				invoke ShowBrushStatus
+				invoke PlaySoundOnClick, offset szPlayOnClick
+		.endif
+		mov isReturn, 0
 		.elseif eax == MOUSE_EVENT
 		mov eax, ConsoleRecord.MouseEvent.dwMousePosition ; 讀取滑鼠的位置到eax
 		mov ebx, eax
@@ -685,13 +720,34 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			mov	byte ptr[clickDone], 1
 			.if ax > 0 && ax <= WORKING_AREA_WIDTH && bx > 2 && bx <= WORKING_AREA_HEIGHT
-				.if prevButtonState == 0
-					mov prevButtonState, 1
-					invoke SaveToHistory
-				.endif
-				invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
-				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.if	isPicker == 1	
+					mov isEraser, 0				
+					mov word ptr[coord], ax       ; coord.X
+					mov word ptr[coord+2], bx 
+					mov bufferSize.x, 1
+					mov bufferSize.y, 1
+					mov bufferCoord.x, 0
+					mov bufferCoord.y, 0
 
+					mov readRegion.Left, ax
+					mov readRegion.Top, bx
+					mov readRegion.Right, ax
+					mov readRegion.Bottom, bx
+					invoke ReadConsoleOutput, hOut, addr chi, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr readRegion
+					movzx eax, chi.Attributes
+					and eax, 0Fh
+					mov dword ptr[drawColor], eax
+					mov isPicker, 0
+					
+					invoke ShowBrushStatus
+				.else	
+					.if prevButtonState == 0
+						mov prevButtonState, 1
+						invoke SaveToHistory
+					.endif
+					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.endif
 			.endif
 		
 		.elseif	byte ptr[clickDone] == 1
@@ -701,41 +757,43 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; FIRST ROW OF BRUSHES
 			.if ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 3 && bx < 6
 			
-				invoke PlaySoundOnClick, offset szPlayOnClick			
+				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], exclBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx >= 3 && bx < 6
-			
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], quoteBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx >= 3 && bx < 6
-			
 				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				mov byte ptr[szToDraw], sharpBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
+						mov isPicker, 0
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx >= 3 && bx < 6
-			
+			mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], dollarBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx >= 3 && bx < 6
-			
+			mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], comAndBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx >= 3 && bx < 6
-			
+			mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], zeroQuoteBrush
 				mov eax, cWhite
@@ -744,42 +802,42 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; SECOND ROW OF BRUSHES
 				
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 6 && bx < 9
-			
+			mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], parenthOBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx >= 6 && bx < 9
-			
+			mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], parenthCBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx >= 6 && bx < 9
-			
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			mov isPicker, 0
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], multiplBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx >= 6 && bx < 9
-			
+			mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov byte ptr[szToDraw], plusBrush
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx >= 6 && bx < 9
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], commaBrush	
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx >= 6 && bx < 9
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], minusBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
@@ -789,269 +847,282 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; THIRD ROW OF BRUSHES
 			
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 9 && bx < 12
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], MBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx >= 9 && bx < 12
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], slashBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx >= 9 && bx < 12
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], colonBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx >= 9 && bx < 12
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], semicolonBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx >= 9 && bx < 12
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], lessBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx >= 9 && bx < 12
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], equalBrush	
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax			
 					mov isEraser, 0
-			
+				invoke PlaySoundOnClick, offset szPlayOnClick
 			; FOURTH ROW OF BRUSHES
 		
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 12 && bx < 15
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], moreBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx >= 12 && bx < 15
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], questionBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx >= 12 && bx < 15
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], atBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx >= 12 && bx < 15
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], squareOBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx >= 12 && bx < 15
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], backSlashBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx >= 12 && bx < 15
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], squareCBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			
+			invoke PlaySoundOnClick, offset szPlayOnClick
 			; FIFTH ROW OF BRUSHES
 		
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+6 && bx >= 15 && bx < 18
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], birdBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+11 && bx >= 15 && bx < 18
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], traitBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+13 && ax <= WORKING_AREA_WIDTH+16 && bx >= 15 && bx < 18
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], braceOBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx >= 15 && bx < 18
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], directBrush
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx >= 15 && bx < 18
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], braceCBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+				invoke PlaySoundOnClick, offset szPlayOnClick
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 						mov isEraser, 0
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx >= 15 && bx < 18
-			
+			mov isPicker, 0
 				mov byte ptr[szToDraw], tildaBrush
-				invoke PlaySoundOnClick, offset szPlayOnClick
+
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax	
 					mov isEraser, 0
-			
+			invoke PlaySoundOnClick, offset szPlayOnClick
 			; SIZE BUTTONS CHECKS
 			
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 20 && bx < 23
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 1
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 20 && bx < 23
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 2
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 20 && bx < 23
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 3
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 23 && bx < 26
-			
-				mov byte ptr[drawSize], 4
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			mov isPicker, 0
+					mov byte ptr[drawSize], 4
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 23 && bx < 26
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 5
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 23 && bx < 26
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 6
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+21 && bx > 26 && bx < 29
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 7
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 								
 			.elseif ax >= WORKING_AREA_WIDTH+23 && ax <= WORKING_AREA_WIDTH+26 && bx > 26 && bx < 29
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 8
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 								
 			.elseif ax >= WORKING_AREA_WIDTH+28 && ax <= WORKING_AREA_WIDTH+31 && bx > 26 && bx < 29
-			
+			mov isPicker, 0
 				mov byte ptr[drawSize], 9
-				invoke PlaySoundOnClick, offset szPlayOnClick
+			invoke PlaySoundOnClick, offset szPlayOnClick
 				
 			
 			; <<< ---------   COLOR BUTTONS CHECK   ------------- >>>
 			; bx = height
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 21 && bx <= 22
-
-				invoke PlaySoundOnClick, offset szPlayOnClick	
+			mov isPicker, 0
 				mov eax, cBlue
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 21 && bx <= 22
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 21 && bx <= 22
+			mov isPicker, 0
 				mov eax, cGreen
 				mov dword ptr[drawColor], eax
-							mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 21 && bx <= 22
+				mov isEraser, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 21 && bx <= 22
+			mov isPicker, 0
 				mov eax, cCyan
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 21 && bx <= 22
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 21 && bx <= 22
+			mov isPicker, 0
 				mov eax, cRed
 				mov dword ptr[drawColor], eax
-							mov isEraser, 0	
-			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 21 && bx <= 22
+				mov isEraser, 0	
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 21 && bx <= 22
+			mov isPicker, 0
 				mov eax, cMagenta
 				mov dword ptr[drawColor], eax
 			mov isEraser, 0
+			invoke PlaySoundOnClick, offset szPlayOnClick
 			; SECOND ROW
 			
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 23 && bx <= 24
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cBrown
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 23 && bx <= 24
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 23 && bx <= 24
+				mov isPicker, 0
 				mov eax, LightGray
 				mov dword ptr[drawColor], eax
-							mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 23 && bx <= 24
+				mov isEraser, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 23 && bx <= 24
+				mov isPicker, 0
 				mov eax, DarkGray
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 23 && bx <= 24
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 23 && bx <= 24
+				mov isPicker, 0
 				mov eax, LightBlue
 				mov dword ptr[drawColor], eax
-								mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 23 && bx <= 24
+				mov isEraser, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 23 && bx <= 24
+				mov isPicker, 0
 				mov eax, LightGreen
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
 			; THIRD ROW
 			
 			.elseif ax >= WORKING_AREA_WIDTH+2 && ax <= WORKING_AREA_WIDTH+4 && bx >= 25 && bx <= 26
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, LightCyan
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 25 && bx <= 26
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+5 && ax <= WORKING_AREA_WIDTH+7 && bx >= 25 && bx <= 26
+				mov isPicker, 0
 				mov eax, LightRed
 				mov dword ptr[drawColor], eax
 							mov isEraser, 0
+							invoke PlaySoundOnClick, offset szPlayOnClick
 			.elseif ax >= WORKING_AREA_WIDTH+8 && ax <= WORKING_AREA_WIDTH+10 && bx >= 25 && bx <= 26
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, LightMagenta
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 25 && bx <= 26
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+13 && bx >= 25 && bx <= 26
+				mov isPicker, 0
 				mov eax, cYellow
 				mov dword ptr[drawColor], eax
 								mov isEraser, 0
+								invoke PlaySoundOnClick, offset szPlayOnClick
 			.elseif ax >= WORKING_AREA_WIDTH+14 && ax <= WORKING_AREA_WIDTH+16 && bx >= 25 && bx <= 26
-				invoke PlaySoundOnClick, offset szPlayOnClick
+				mov isPicker, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
 				mov isEraser, 0
-												
+				invoke PlaySoundOnClick, offset szPlayOnClick				
 			; SPECIAL BUTTONS CHECKS
 			
 			; CLEAR	
@@ -1063,7 +1134,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			; EXPORT
 			
 			.elseif ax >= WORKING_AREA_WIDTH+18 && ax <= WORKING_AREA_WIDTH+31 && bx > WORKING_AREA_HEIGHT-3 && bx < WORKING_AREA_HEIGHT+1
-			
+				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke PlaySoundOnClick, offset szPlayOnClick
 				invoke ExportImageEvent
 			; IMPORT	
@@ -1077,15 +1148,21 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 			
 			.elseif ax >= WORKING_AREA_WIDTH+3 && ax <= WORKING_AREA_WIDTH+9 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
 		  	  mov isEraser, 1
-
+				mov isPicker, 0
 				mov byte ptr[szToDraw], ' '
 				mov eax, interfaceBorderColor
 				mov dword ptr[drawColor], eax
 				invoke PlaySoundOnClick, offset szPlayOnClick
-					
+			; Picker
+
+			.elseif ax >= WORKING_AREA_WIDTH+11 && ax <= WORKING_AREA_WIDTH+17 && bx >= WORKING_AREA_HEIGHT-6 && bx < WORKING_AREA_HEIGHT-3
+				mov isPicker, 1
+				mov isEraser, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
 			.endif
 				 ; 儲存本次狀態供下次比對
     			mov prevButtonState, 0
+
 				invoke ShowBrushStatus
 			;		invoke Sleep, densityBrush  Idea for regulation of brushes' density
 		.endif
