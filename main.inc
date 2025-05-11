@@ -164,7 +164,7 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	szPictureImported			db			"Picture has been successfully imported!", 0
 	szFileNotFound 				db			"No .txt file with such name. Try again.", 0
 	szClearLine					db			"          ", 0  ; 10 spaces
-	
+	szDClearLine				db			"                    ", 0
 	szImage						db			"Image.txt", 0
 	szTxt						db			".txt", 0
 	szNewLine					db			13, 10, 0
@@ -187,6 +187,8 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	isEraser       dd  0
 	isPicker        db 0
 	isSquare       db 0
+	isCircle      db 0
+	radius db 5      ; 可自由設定圓半徑
 	strEraser		db "[Eraser]: Size %d ", 0
 	fmtBrushStatus db  " [brush]: Size %d", 0
 	; return 狀態

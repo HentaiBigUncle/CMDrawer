@@ -379,6 +379,9 @@ draw_vertical:
     ret
 DrawSquare endp
 
+DrawCircle proc uses ebx ecx edx esi edi,
+
+DrawCircle endp
 
 
 
@@ -406,8 +409,17 @@ ShowBrushStatus proc uses eax ebx ecx edx
 	.elseif isPicker == 1
         invoke SetColor, LightGray
         invoke crt_printf, offset szPickerButtonText
+
+	.elseif isSquare == 1
+        invoke SetColor, LightGray
+        invoke crt_printf, offset szSquareButtonText
+		invoke crt_printf, offset szDClearLine
+	.elseif isCircle == 1
+		invoke SetColor, LightGray
+		invoke crt_printf, offset szCircleButtonText
+		invoke crt_printf, offset szDClearLine
 	.elseif isReturn == 1
-		   invoke SetColor, LightGray
+		invoke SetColor, LightGray
         invoke crt_printf, offset strReturn
     .else
         ; 顏色的brush
@@ -816,7 +828,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				.if isSquare == 1
 					invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					mov isSquare, 0
-					
+				.elseif isCircle == 1
+					invoke DrawCircle, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+					mov isCircle, 0
 				.else
 					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 				.endif
@@ -1261,7 +1275,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				invoke PlaySoundOnClick, offset szPlayOnClick
 			; SQUARE
 
-			.elseif ax >= 2 && ax <= 8 && bx >= WORKING_AREA_HEIGHT+3 && bx < WORKING_AREA_HEIGHT+6
+			.elseif ax >= 2 && ax <= 8 && bx >= WORKING_AREA_HEIGHT+8 && bx < WORKING_AREA_HEIGHT+11
 				.if isEraser == 1
 				mov byte ptr[szToDraw], MBrush
 				.endif
@@ -1270,6 +1284,16 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 
+			; CIRCLE
+
+			.elseif ax >= 10 && ax <= 16 && bx >= WORKING_AREA_HEIGHT+8 && bx < WORKING_AREA_HEIGHT+11
+				.if isEraser == 1
+				mov byte ptr[szToDraw], MBrush
+				.endif
+				mov isCircle, 1
+				mov isEraser, 0
+				mov isPicker, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
 			.endif
 				 ; 儲存本次狀態供下次比對
     			mov prevButtonState, 0

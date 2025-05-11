@@ -37,6 +37,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szEraserButtonText      db			"Eraser", 0
 	szPickerButtonText 		db			"Picker               ", 0
 	szSquareButtonText		db			"Square", 0
+	szCircleButtonText				db			"Circle", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
 	szProgramVersion		db			"CMDrawer", 0
@@ -284,7 +285,7 @@ SpecialButtonsCreate proc uses ecx esi edi
 	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-4
 	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-5
 	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+32, WORKING_AREA_HEIGHT-4
-	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-3
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-2
 	
 	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
 	invoke PutCursorToPos, 142, WORKING_AREA_HEIGHT-4
@@ -313,15 +314,29 @@ SpecialButtonsCreate proc uses ecx esi edi
 	invoke crt_printf, offset szPickerButtonText
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 
-	invoke VerticalBorderConstruct, 3, 1, WORKING_AREA_HEIGHT+3
-	invoke HorizontalBorderConstruct, 6, 2, WORKING_AREA_HEIGHT+2
-	invoke VerticalBorderConstruct, 3, 8, WORKING_AREA_HEIGHT+3
-	invoke HorizontalBorderConstruct, 6, 2, WORKING_AREA_HEIGHT+6
+	; Square Button Creating
+	invoke VerticalBorderConstruct, 3, 1, WORKING_AREA_HEIGHT+8
+	invoke HorizontalBorderConstruct, 6, 2, WORKING_AREA_HEIGHT+7
+	invoke VerticalBorderConstruct, 3, 8, WORKING_AREA_HEIGHT+8
+	invoke HorizontalBorderConstruct, 6, 2, WORKING_AREA_HEIGHT+11
 	
 	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
-	invoke PutCursorToPos, 2, WORKING_AREA_HEIGHT+4
+	invoke PutCursorToPos, 2, WORKING_AREA_HEIGHT+9
 	invoke crt_printf, offset szSquareButtonText
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+
+	; Square Button Creating
+	invoke VerticalBorderConstruct, 3, 9, WORKING_AREA_HEIGHT+8
+	invoke HorizontalBorderConstruct, 6, 10, WORKING_AREA_HEIGHT+7
+	invoke VerticalBorderConstruct, 3, 16, WORKING_AREA_HEIGHT+8
+	invoke HorizontalBorderConstruct, 6, 10, WORKING_AREA_HEIGHT+11
+	
+	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+	invoke PutCursorToPos, 10, WORKING_AREA_HEIGHT+9
+	invoke crt_printf, offset szCircleButtonText
+	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+
+
 	Ret
 SpecialButtonsCreate endp
 
