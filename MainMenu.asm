@@ -35,7 +35,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szExportButtonText		db			"Export", 0
 	szImportButtonText		db			"Import", 0
 	szEraserButtonText      db			"Eraser", 0
-	szPickerButtonText 		db			"Picker", 0
+	szPickerButtonText 		db			"Picker               ", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
 	szProgramVersion		db			"CMDrawer", 0
