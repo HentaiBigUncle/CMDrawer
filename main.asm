@@ -281,84 +281,110 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	.endw
 	Ret
 DrawCell endp
-DrawSquare proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+DrawSquare proc uses ebx ecx edx esi edi,
+    hOut: DWORD, dwCoord: DWORD
+
     LOCAL startX: WORD
     LOCAL startY: WORD
+    LOCAL squareWidth: DWORD
+    LOCAL squareHeight: DWORD
     LOCAL curCoord: DWORD
 
-    ; 設定顏色
-    invoke SetColor, dword ptr[drawColor]
+    ;=========================
+    ; 計算方形寬高 (根據 drawSize)
+    ;=========================
+    movzx eax, byte ptr [drawSize]
+    mov ecx, eax
+    shl eax, 1                 ; 寬 = drawSize * 2
+    mov squareWidth, eax
+    mov squareHeight, ecx     ; 高 = drawSize
 
-    ; 拆解 dwCoord 為 X, Y
+    ;=========================
+    ; 拆解 dwCoord 為中心座標
+    ;=========================
     mov eax, dwCoord
     mov ecx, eax
-    and ecx, 0FFFFh       ; ECX = X
+    and ecx, 0FFFFh            ; ECX = X
     mov edx, eax
-    shr edx, 16           ; EDX = Y
+    shr edx, 16                ; EDX = Y
 
-    sub ecx, 10           ; X 左移一半寬度 (20 / 2)
-    sub edx, 5            ; Y 上移一半高度 (10 / 2)
+    ;=========================
+    ; 計算左上角座標
+    ;=========================
+    mov eax, squareWidth
+    shr eax, 1
+    sub ecx, eax               ; startX = X - width / 2
 
-    ; Y 要補 +2（因為畫布從第3行開始）
-    add edx, 2
+    mov eax, squareHeight
+    shr eax, 1
+    sub edx, eax               ; startY = Y - height / 2
+    add edx, 2                 ; 往下補行數（畫布從第3行開始）
 
-    mov startX, cx
-    mov startY, dx
+    mov word ptr [startX], cx
+    mov word ptr [startY], dx
 
+    ;=========================
+    ; 設定顏色
+    ;=========================
+    invoke SetColor, dword ptr [drawColor]
+
+    ;=========================
     ; 畫上邊 & 下邊
+    ;=========================
     mov ebx, 0
 draw_horizontal:
-    ; 上邊
-    movzx eax, startY
+    movzx eax, word ptr [startY]     ; Y 上邊
     shl eax, 16
-    movzx ecx, startX
+    movzx ecx, word ptr [startX]
     add ecx, ebx
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
-    ; 下邊
-    movzx eax, startY
-    add eax, 9              ; 高度-1 = 9
+    movzx eax, word ptr [startY]
+    add eax, squareHeight
+    dec eax                          ; Y 下邊（height - 1）
     shl eax, 16
-    movzx ecx, startX
+    movzx ecx, word ptr [startX]
     add ecx, ebx
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
     inc ebx
-    cmp ebx, 20
+    cmp ebx, squareWidth
     jl draw_horizontal
 
+    ;=========================
     ; 畫左邊 & 右邊
-    mov ebx, 1          ; 中間的邊，從第2行畫到倒數第2行（不含上下邊）
+    ;=========================
+    mov ebx, 1                         ; 從第2行到倒數第2行（排除上下邊）
 draw_vertical:
-    ; 左邊
-    movzx eax, startY
+    movzx eax, word ptr [startY]
     add eax, ebx
     shl eax, 16
-    movzx ecx, startX
+    movzx ecx, word ptr [startX]
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
-    ; 右邊
-    movzx eax, startY
+    movzx eax, word ptr [startY]
     add eax, ebx
     shl eax, 16
-    movzx ecx, startX
-    add ecx, 19          ; 寬度-1 = 19
+    movzx ecx, word ptr [startX]
+    add ecx, squareWidth
+    dec ecx                          ; 最右邊 = width - 1
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
     inc ebx
-    cmp ebx, 9
+    cmp ebx, squareHeight
     jl draw_vertical
 
     ret
 DrawSquare endp
+
 
 
 ShowBrushStatus proc uses eax ebx ecx edx
