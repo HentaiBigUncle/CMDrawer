@@ -2,17 +2,18 @@
 .model flat, stdcall
 option casemap :none
 
-include \masm32\include\kernel32.inc	; Basement
-include \masm32\include\windows.inc		; API for console, etc
-include \masm32\include\msvcrt.inc		; C-funcs (may be I will write mine instead)
-include \masm32\include\winmm.inc		; multimedia lib
-include \masm32\include\user32.inc	
-include \masm32\macros\macros.asm
+include kernel32.inc
+include windows.inc
+include msvcrt.inc
+include winmm.inc
+include user32.inc
+include masm32.inc
+include macros.asm
 
-includelib \masm32\lib\kernel32.lib
-includelib \masm32\lib\msvcrt.lib
-includelib \masm32\lib\winmm.lib
-includelib \masm32\lib\user32.lib
+includelib kernel32.lib
+includelib msvcrt.lib
+includelib winmm.lib
+includelib user32.lib
 
 
 
@@ -185,8 +186,5 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	; 判斷是否為橡皮擦
 	isEraser       dd  0
 	isPicker        db 0
-	isReturn dd 0
 	strEraser		db "[Eraser]: Size %d ", 0
 	fmtBrushStatus db  " [brush]: Size %d", 0
-	; retrun inform
-	strReturn  db "return              ", 0
