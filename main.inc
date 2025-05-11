@@ -117,8 +117,7 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	commaBrush		equ		44
 	minusBrush		equ		45
 	
-	MBrush equ 'M'   ; richen:將dotBrush他改成M
-
+	MBrush equ 'M' 
 	slashBrush		equ		47
 	colonBrush		equ		58
 	semicolonBrush	equ		59
@@ -187,6 +186,7 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	; 判斷是否為橡皮擦
 	isEraser       dd  0
 	isPicker        db 0
+	isSquare       db 0
 	strEraser		db "[Eraser]: Size %d ", 0
 	fmtBrushStatus db  " [brush]: Size %d", 0
 	; return 狀態

@@ -281,65 +281,50 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	.endw
 	Ret
 DrawCell endp
-
- DrawSquare proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+DrawSquare proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 
 	LOCAL localCoord: DWORD
+	LOCAL tempCoord: DWORD
 
-	; 設定顏色
 	invoke SetColor, dword ptr[drawColor]
 
-	; 取得中心點座標 → 推算左上角的起始點
 	mov eax, dwCoord
 	mov ecx, eax
 	and ecx, 0FFFFh       ; ECX = X
 	mov edx, eax
 	shr edx, 16           ; EDX = Y
 
-	sub ecx, 2            ; X - 2
-	sub edx, 2            ; Y - 2
+	sub ecx, 2
+	sub edx, 2
 
 	shl edx, 16
-	or ecx, edx           ; 將 Y<<16 | X 組合成 DWORD
-	mov localCoord, ecx   ; 存入起始座標
+	or ecx, edx
+	mov localCoord, ecx
+	mov tempCoord, ecx
 
-
-	; ===================
-	; 橫向輸出一列字元
-	; ===================
-
+	; 橫向一行
 	lea esi, szBrushBuffer
 	mov ebx, 0
-
-	mov ecx, 0  ; 為了記錄 cx 寬度邊界比較
-
-.while ebx < 5 && ecx < WORKING_AREA_WIDTH
+.while ebx < 5
 	mov al, byte ptr[szToDraw]
 	mov byte ptr[esi], al
 	inc ebx
 	inc esi
-	inc ecx
 .endw
+	mov byte ptr[esi], 0
 
-	
-
-	; ====================
-	; 垂直列印多行字元列
-	; ====================
-
+	; 垂直列印
 	mov ebx, 0
-	mov eax, localCoord
-
 .while ebx < 5
-	invoke SetConsoleCursorPosition, hOut, eax
+	invoke SetConsoleCursorPosition, hOut, tempCoord
 	invoke crt_printf, offset szBrushBuffer
-
-	add eax, 65536    ; Y++
+	add tempCoord, 65536
 	inc ebx
 .endw
 
 	ret
 DrawSquare endp
+
 
 ShowBrushStatus proc uses eax ebx ecx edx
 
@@ -731,6 +716,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov isPicker, 1
 				mov isEraser, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif al == 'Q' || al == 'q'
+				invoke ExitProcess, 0
+
 		.endif
 				invoke ShowBrushStatus
 				mov isReturn, 0
@@ -769,8 +757,13 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 						mov prevButtonState, 1
 						invoke SaveToHistory
 					.endif
+				.if isSquare == 1
+					invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+					mov isSquare, 0
+					
+				.else
 					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
-				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.endif
 				.endif
 			.endif
 		
@@ -1209,6 +1202,16 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov isPicker, 1
 				mov isEraser, 0
 
+				invoke PlaySoundOnClick, offset szPlayOnClick
+			; SQUARE
+
+			.elseif ax >= 2 && ax <= 8 && bx >= WORKING_AREA_HEIGHT+3 && bx < WORKING_AREA_HEIGHT+6
+				.if isEraser == 1
+				mov byte ptr[szToDraw], MBrush
+				.endif
+				mov isSquare, 1
+				mov isEraser, 0
+				mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
 
 			.endif
