@@ -365,7 +365,9 @@ ShowBrushStatus proc uses eax ebx ecx edx
 	.elseif isPicker == 1
         invoke SetColor, LightGray
         invoke crt_printf, offset szPickerButtonText
-	
+	.elseif isReturn == 1
+		   invoke SetColor, LightGray
+        invoke crt_printf, offset strReturn
     .else
         ; 顏色的brush
 		invoke SetColor, dword ptr[drawColor]
