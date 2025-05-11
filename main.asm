@@ -502,18 +502,18 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 		; THIRD ROW OF BRUSHES
 		.elseif al == 'M'
 					mov isPicker, 0
+					mov isEraser, 0
 				mov byte ptr[szToDraw], MBrush
 	
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
-						mov isEraser, 0
 			.elseif  al == '/'
 			
 				mov byte ptr[szToDraw], slashBrush
 				mov isPicker, 0
+				mov isEraser, 0
 				mov eax, cWhite
 				mov dword ptr[drawColor], eax
-						mov isEraser, 0
 			.elseif  al == ':'
 			
 				mov byte ptr[szToDraw], colonBrush
