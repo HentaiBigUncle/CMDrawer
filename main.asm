@@ -282,47 +282,82 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	Ret
 DrawCell endp
 DrawSquare proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+    LOCAL startX: WORD
+    LOCAL startY: WORD
+    LOCAL curCoord: DWORD
 
-	LOCAL localCoord: DWORD
-	LOCAL tempCoord: DWORD
+    ; 設定顏色
+    invoke SetColor, dword ptr[drawColor]
 
-	invoke SetColor, dword ptr[drawColor]
+    ; 拆解 dwCoord 為 X, Y
+    mov eax, dwCoord
+    mov ecx, eax
+    and ecx, 0FFFFh       ; ECX = X
+    mov edx, eax
+    shr edx, 16           ; EDX = Y
 
-	mov eax, dwCoord
-	mov ecx, eax
-	and ecx, 0FFFFh       ; ECX = X
-	mov edx, eax
-	shr edx, 16           ; EDX = Y
+    sub ecx, 10           ; X 左移一半寬度 (20 / 2)
+    sub edx, 5            ; Y 上移一半高度 (10 / 2)
 
-	sub ecx, 2
-	sub edx, 2
+    ; Y 要補 +2（因為畫布從第3行開始）
+    add edx, 2
 
-	shl edx, 16
-	or ecx, edx
-	mov localCoord, ecx
-	mov tempCoord, ecx
+    mov startX, cx
+    mov startY, dx
 
-	; 橫向一行
-	lea esi, szBrushBuffer
-	mov ebx, 0
-.while ebx < 5
-	mov al, byte ptr[szToDraw]
-	mov byte ptr[esi], al
-	inc ebx
-	inc esi
-.endw
-	mov byte ptr[esi], 0
+    ; 畫上邊 & 下邊
+    mov ebx, 0
+draw_horizontal:
+    ; 上邊
+    movzx eax, startY
+    shl eax, 16
+    movzx ecx, startX
+    add ecx, ebx
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
 
-	; 垂直列印
-	mov ebx, 0
-.while ebx < 5
-	invoke SetConsoleCursorPosition, hOut, tempCoord
-	invoke crt_printf, offset szBrushBuffer
-	add tempCoord, 65536
-	inc ebx
-.endw
+    ; 下邊
+    movzx eax, startY
+    add eax, 9              ; 高度-1 = 9
+    shl eax, 16
+    movzx ecx, startX
+    add ecx, ebx
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
 
-	ret
+    inc ebx
+    cmp ebx, 20
+    jl draw_horizontal
+
+    ; 畫左邊 & 右邊
+    mov ebx, 1          ; 中間的邊，從第2行畫到倒數第2行（不含上下邊）
+draw_vertical:
+    ; 左邊
+    movzx eax, startY
+    add eax, ebx
+    shl eax, 16
+    movzx ecx, startX
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+    ; 右邊
+    movzx eax, startY
+    add eax, ebx
+    shl eax, 16
+    movzx ecx, startX
+    add ecx, 19          ; 寬度-1 = 19
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+    inc ebx
+    cmp ebx, 9
+    jl draw_vertical
+
+    ret
 DrawSquare endp
 
 
