@@ -58,7 +58,6 @@ MenuCreate proc	uses ecx esi edi
 	invoke LogoCreate
 	invoke DrawAreaCreate
 	invoke ToolsAreaCreate
-	invoke SpecialButtonsCreate
 	invoke SizeAndColorToolCreate
 	invoke ExtraInfoAreaCreate
 	
@@ -146,7 +145,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, directBrush, WORKING_AREA_WIDTH+18, 15
 	invoke ButtonCreate2, braceCBrush, WORKING_AREA_WIDTH+23, 15
 	invoke ButtonCreate2, tildaBrush, WORKING_AREA_WIDTH+28, 15
-
+	invoke SpecialButtonsCreate
 	Ret
 ToolsAreaCreate endp
 
