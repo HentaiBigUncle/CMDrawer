@@ -35,7 +35,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szExportButtonText		db			"Export", 0
 	szImportButtonText		db			"Import", 0
 	szEraserButtonText      db			"Eraser", 0
-	szPickerButtonText 		db			"Picker             ", 0
+	szPickerButtonText 		db			"Picker", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
 	szProgramVersion		db			"CMDrawer", 0
@@ -145,6 +145,7 @@ ToolsAreaCreate proc uses ecx esi edi
 	invoke ButtonCreate2, directBrush, WORKING_AREA_WIDTH+18, 15
 	invoke ButtonCreate2, braceCBrush, WORKING_AREA_WIDTH+23, 15
 	invoke ButtonCreate2, tildaBrush, WORKING_AREA_WIDTH+28, 15
+
 	invoke SpecialButtonsCreate
 	Ret
 ToolsAreaCreate endp
@@ -279,10 +280,10 @@ SpecialButtonsCreate proc uses ecx esi edi
 	invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
 	
 	; Import Button Creating
-	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-4
-	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+20, WORKING_AREA_HEIGHT-5
-	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+33, WORKING_AREA_HEIGHT-4
-	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+20, WORKING_AREA_HEIGHT-3
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+18, WORKING_AREA_HEIGHT-4
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-5
+	invoke VerticalBorderConstruct, 1, WORKING_AREA_WIDTH+32, WORKING_AREA_HEIGHT-4
+	invoke HorizontalBorderConstruct, 13, WORKING_AREA_WIDTH+19, WORKING_AREA_HEIGHT-3
 	
 	invoke SetConsoleTextAttribute, hOut, interfaceFontColor
 	invoke PutCursorToPos, 142, WORKING_AREA_HEIGHT-4
