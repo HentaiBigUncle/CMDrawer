@@ -189,3 +189,6 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	isPicker        db 0
 	strEraser		db "[Eraser]: Size %d ", 0
 	fmtBrushStatus db  " [brush]: Size %d", 0
+	; return 狀態
+	isReturn   dd  0
+	strReturn db "Return             ", 0
