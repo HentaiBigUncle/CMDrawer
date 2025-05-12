@@ -379,9 +379,114 @@ draw_vertical:
     ret
 DrawSquare endp
 
-DrawCircle proc uses ebx ecx edx esi edi,
+DrawCross proc uses ebx ecx edx esi edi,
+    hOut: DWORD, dwCoord: DWORD
 
-DrawCircle endp
+    LOCAL centerX: WORD
+    LOCAL centerY: WORD
+    LOCAL drawRadius: DWORD
+
+    ;=======================
+    ; 計算畫十字的範圍
+    ;=======================
+    movzx eax, byte ptr [drawSize]  ; drawSize 是半徑
+    mov drawRadius, eax
+
+    ;=======================
+    ; 拆解 dwCoord（中心點）
+    ;=======================
+    mov eax, dwCoord
+    mov ecx, eax
+    and ecx, 0FFFFh                 ; ECX = X
+    mov edx, eax
+    shr edx, 16                     ; EDX = Y
+
+    mov word ptr [centerX], cx
+    mov word ptr [centerY], dx
+
+    ;=======================
+    ; 設定顏色
+    ;=======================
+    invoke SetColor, dword ptr [drawColor]
+
+    ;=======================
+    ; 畫橫線（從左到右）
+    ;=======================
+    mov ebx, -1
+    neg ebx
+draw_horizontal:
+    movzx eax, word ptr [centerY]
+    shl eax, 16
+    movzx ecx, word ptr [centerX]
+    add ecx, ebx
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+    inc ebx
+    cmp ebx, drawRadius
+    jle draw_horizontal
+
+    ;=======================
+    ; 畫直線（從上到下）
+    ;=======================
+    mov ebx, -1
+    neg ebx
+draw_vertical:
+    movzx eax, word ptr [centerY]
+    add eax, ebx
+    shl eax, 16
+    movzx ecx, word ptr [centerX]
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+    inc ebx
+    cmp ebx, drawRadius
+    jle draw_vertical
+
+    
+	   ;=======================
+    ; 畫橫線（從左到右）
+    ;=======================
+    mov ebx, 0
+draw_horizontal2:
+    movzx eax, word ptr [centerY]
+    shl eax, 16
+    movzx ecx, word ptr [centerX]
+    sub ecx, drawRadius
+    add ecx, ebx
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+    inc ebx
+    cmp ebx, drawRadius
+    shl ecx, 1                      ; 擴大成中心左右對稱範圍
+    cmp ebx, drawRadius
+    jl draw_horizontal2
+
+    ;=======================
+    ; 畫直線（從上到下）
+    ;=======================
+    mov ebx, 0
+draw_vertical2:
+    movzx eax, word ptr [centerY]
+    sub eax, drawRadius
+    add eax, ebx
+    shl eax, 16
+    movzx ecx, word ptr [centerX]
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+    inc ebx
+    cmp ebx, drawRadius
+    shl ecx, 1
+    cmp ebx, drawRadius
+    jl draw_vertical2
+	ret
+DrawCross endp
 
 
 
@@ -829,7 +934,7 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 					invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					mov isSquare, 0
 				.elseif isCircle == 1
-					invoke DrawCircle, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+					invoke DrawCross , hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					mov isCircle, 0
 				.else
 					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]

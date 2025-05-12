@@ -37,7 +37,7 @@ VerticalBorderConstruct		proto	:DWORD, :DWORD, :DWORD
 	szEraserButtonText      db			"Eraser", 0
 	szPickerButtonText 		db			"Picker               ", 0
 	szSquareButtonText		db			"Square", 0
-	szCircleButtonText				db			"Circle", 0
+	szCircleButtonText				db			"Christ", 0
 	szSizeText				db			"SIZE:", 0
 	szColorText				db			"COLORS:", 0
 	szProgramVersion		db			"CMDrawer", 0
