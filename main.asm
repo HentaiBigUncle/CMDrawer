@@ -235,8 +235,8 @@ copyback:
 
     mov writeRegion.Left, 1
     mov writeRegion.Top, 3
-    mov writeRegion.Right, HISTORY_WIDTH + 2
-    mov writeRegion.Bottom, HISTORY_HEIGHT + 4
+    mov writeRegion.Right, HISTORY_WIDTH + 1
+    mov writeRegion.Bottom, HISTORY_HEIGHT + 1
 
     ; 寫入畫面
     invoke WriteConsoleOutput, hConsoleOutput, addr tempBuffer, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr writeRegion
@@ -282,7 +282,6 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	Ret
 DrawCell endp
 
-
 DrawSquare proc uses ebx ecx edx esi edi,
     hOut: DWORD, dwCoord: DWORD
 
@@ -291,6 +290,20 @@ DrawSquare proc uses ebx ecx edx esi edi,
     LOCAL squareWidth: DWORD
     LOCAL squareHeight: DWORD
     LOCAL curCoord: DWORD
+
+    ; 邊界常數
+    LOCAL regLeft: DWORD
+    LOCAL regRight: DWORD
+    LOCAL regTop: DWORD
+    LOCAL regBottom: DWORD
+
+    ;=======================
+    ; 設定邊界範圍
+    ;=======================
+    mov regLeft, 1
+    mov regTop, 3
+    mov regRight, HISTORY_WIDTH + 1
+    mov regBottom, HISTORY_HEIGHT + 1
 
     ;=======================
     ; 計算方形寬高
@@ -323,25 +336,49 @@ DrawSquare proc uses ebx ecx edx esi edi,
     ;=======================
     mov ebx, 0
 draw_horizontal:
-    ; 上邊
-    movzx eax, word ptr [startY]
-    shl eax, 16
+    ; -------- 上邊 --------
+    movzx edx, word ptr [startY]
     movzx ecx, word ptr [startX]
     add ecx, ebx
-    or eax, ecx
-    invoke SetConsoleCursorPosition, hOut, eax
-    invoke crt_printf, offset szToDraw
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_top
+    cmp ecx, regRight
+    jnb skip_top
+    cmp edx, regTop
+    jb skip_top
+    cmp edx, regBottom
+    jnb skip_top
 
-    ; 下邊
-    movzx eax, word ptr [startY]
-    add eax, squareHeight
-    dec eax                  ; Y + height - 1
+    mov eax, edx
     shl eax, 16
-    movzx ecx, word ptr [startX]
-    add ecx, ebx
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
+skip_top:
+
+    ; -------- 下邊 --------
+    movzx edx, word ptr [startY]
+    add edx, squareHeight
+    dec edx                      ; bottom Y
+    movzx ecx, word ptr [startX]
+    add ecx, ebx
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_bottom
+    cmp ecx, regRight
+    jnb skip_bottom
+    cmp edx, regTop
+    jb skip_bottom
+    cmp edx, regBottom
+    jnb skip_bottom
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+skip_bottom:
 
     inc ebx
     cmp ebx, squareWidth
@@ -350,27 +387,51 @@ draw_horizontal:
     ;=======================
     ; 畫 左邊 & 右邊
     ;=======================
-    mov ebx, 1                         ; 不重畫上下邊
+    mov ebx, 1 ; 不重畫上下邊
 draw_vertical:
-    ; 左邊
-    movzx eax, word ptr [startY]
-    add eax, ebx
-    shl eax, 16
+    ; -------- 左邊 --------
+    movzx edx, word ptr [startY]
+    add edx, ebx
     movzx ecx, word ptr [startX]
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_left
+    cmp ecx, regRight
+    jnb skip_left
+    cmp edx, regTop
+    jb skip_left
+    cmp edx, regBottom
+    jnb skip_left
+
+    mov eax, edx
+    shl eax, 16
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
+skip_left:
 
-    ; 右邊
-    movzx eax, word ptr [startY]
-    add eax, ebx
-    shl eax, 16
+    ; -------- 右邊 --------
+    movzx edx, word ptr [startY]
+    add edx, ebx
     movzx ecx, word ptr [startX]
     add ecx, squareWidth
-    dec ecx                          ; width - 1
+    dec ecx
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_right
+    cmp ecx, regRight
+    jnb skip_right
+    cmp edx, regTop
+    jb skip_right
+    cmp edx, regBottom
+    jnb skip_right
+
+    mov eax, edx
+    shl eax, 16
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
+skip_right:
 
     inc ebx
     cmp ebx, squareHeight
@@ -385,6 +446,12 @@ DrawCross proc uses ebx ecx edx esi edi,
     LOCAL centerX: WORD
     LOCAL centerY: WORD
     LOCAL drawRadius: DWORD
+
+    ; 邊界常數
+    LOCAL regLeft: DWORD
+    LOCAL regRight: DWORD
+    LOCAL regTop: DWORD
+    LOCAL regBottom: DWORD
 
     ;=======================
     ; 計算畫十字的範圍
@@ -405,88 +472,147 @@ DrawCross proc uses ebx ecx edx esi edi,
     mov word ptr [centerY], dx
 
     ;=======================
+    ; 設定邊界範圍
+    ;=======================
+    mov regLeft, 1
+    mov regTop, 3
+    mov eax, HISTORY_WIDTH
+    mov regRight, eax
+    mov eax, HISTORY_HEIGHT
+    mov regBottom, eax
+
+    ;=======================
     ; 設定顏色
     ;=======================
     invoke SetColor, dword ptr [drawColor]
 
     ;=======================
-    ; 畫橫線（從左到右）
+    ; 畫橫線（右）
     ;=======================
     mov ebx, -1
     neg ebx
 draw_horizontal:
-    movzx eax, word ptr [centerY]
-    shl eax, 16
+    movzx edx, word ptr [centerY]     ; Y
     movzx ecx, word ptr [centerX]
-    add ecx, ebx
+    add ecx, ebx                      ; X = centerX + offset
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_h1
+    cmp ecx, regRight
+    jg skip_h1
+    cmp edx, regTop
+    jl skip_h1
+    cmp edx, regBottom
+    jg skip_h1
+
+    mov eax, edx
+    shl eax, 16
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
+skip_h1:
     inc ebx
     cmp ebx, drawRadius
     jle draw_horizontal
 
     ;=======================
-    ; 畫直線（從上到下）
+    ; 畫直線（下）
     ;=======================
     mov ebx, -1
     neg ebx
 draw_vertical:
-    movzx eax, word ptr [centerY]
-    add eax, ebx
+    movzx edx, word ptr [centerY]
+    add edx, ebx                     ; Y = centerY + offset
+    movzx ecx, word ptr [centerX]   ; X
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_v1
+    cmp ecx, regRight
+    jg skip_v1
+    cmp edx, regTop
+    jl skip_v1
+    cmp edx, regBottom
+    jg skip_v1
+
+    mov eax, edx
     shl eax, 16
-    movzx ecx, word ptr [centerX]
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
+skip_v1:
     inc ebx
     cmp ebx, drawRadius
     jle draw_vertical
 
-    
-	   ;=======================
-    ; 畫橫線（從左到右）
+    ;=======================
+    ; 畫橫線（左）
     ;=======================
     mov ebx, 0
 draw_horizontal2:
-    movzx eax, word ptr [centerY]
-    shl eax, 16
+    movzx edx, word ptr [centerY]     ; Y
     movzx ecx, word ptr [centerX]
     sub ecx, drawRadius
-    add ecx, ebx
+    add ecx, ebx                      ; X = centerX - radius + offset
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_h2
+    cmp ecx, regRight
+    jg skip_h2
+    cmp edx, regTop
+    jl skip_h2
+    cmp edx, regBottom
+    jg skip_h2
+
+    mov eax, edx
+    shl eax, 16
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
+skip_h2:
     inc ebx
-    cmp ebx, drawRadius
-    shl ecx, 1                      ; 擴大成中心左右對稱範圍
     cmp ebx, drawRadius
     jl draw_horizontal2
 
     ;=======================
-    ; 畫直線（從上到下）
+    ; 畫直線（上）
     ;=======================
     mov ebx, 0
 draw_vertical2:
-    movzx eax, word ptr [centerY]
-    sub eax, drawRadius
-    add eax, ebx
+    movzx edx, word ptr [centerY]
+    sub edx, drawRadius
+    add edx, ebx                     ; Y = centerY - radius + offset
+    movzx ecx, word ptr [centerX]   ; X
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_v2
+    cmp ecx, regRight
+    jg skip_v2
+    cmp edx, regTop
+    jl skip_v2
+    cmp edx, regBottom
+    jg skip_v2
+
+    mov eax, edx
     shl eax, 16
-    movzx ecx, word ptr [centerX]
     or eax, ecx
     invoke SetConsoleCursorPosition, hOut, eax
     invoke crt_printf, offset szToDraw
 
+skip_v2:
     inc ebx
     cmp ebx, drawRadius
-    shl ecx, 1
-    cmp ebx, drawRadius
     jl draw_vertical2
-	ret
+
+    ret
 DrawCross endp
+
 
 
 
