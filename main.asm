@@ -282,6 +282,59 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	Ret
 DrawCell endp
 
+.data
+currentColor DWORD 0
+
+.code
+DrawCell2 proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+
+    ; 使用目前的顏色
+    mov eax, currentColor
+    invoke SetColor, eax
+
+    ; 準備畫筆緩衝區
+    lea esi, szBrushBuffer
+    mov ebx, 0
+    mov cx, word ptr[dwCoord]
+
+    ; 畫出橫向的字符
+    .while ebx < drawSize && cx <= WORKING_AREA_WIDTH
+        mov al, byte ptr[szToDraw]
+        mov byte ptr[esi], al
+        inc ebx
+        inc esi
+        inc cx
+    .endw
+    mov byte ptr[esi], 0
+
+    ; 垂直列印緩衝區
+    mov ebx, 0
+    mov cx, word ptr[dwCoord+2]
+    .while ebx < drawSize && cx <= WORKING_AREA_HEIGHT
+        push ecx
+        invoke SetConsoleCursorPosition, hOut, dwCoord
+        invoke crt_printf, offset szBrushBuffer
+        pop ecx
+
+        inc ebx
+        inc cx
+        add dwCoord, 65536
+    .endw
+
+    ; 更新顏色（輪替）
+    mov eax, currentColor
+    inc eax
+    cmp eax, 15
+    jl  SkipResetColor
+    xor eax, eax  ; 重設為 0
+
+SkipResetColor:
+    mov currentColor, eax
+
+    ret
+DrawCell2 endp
+
+
 DrawSquare proc uses ebx ecx edx esi edi,
     hOut: DWORD, dwCoord: DWORD
 
@@ -648,6 +701,22 @@ ShowBrushStatus proc uses eax ebx ecx edx
 	.elseif isCircle == 1
 		invoke SetColor, LightGray
 		invoke crt_printf, offset szCircleButtonText
+		invoke crt_printf, offset szDClearLine
+	.elseif isRainbow == 1
+		invoke SetColor, cRed
+		invoke crt_printf, offset rt1
+		invoke SetColor, LightRed
+		invoke crt_printf, offset rt2
+		invoke SetColor, cYellow
+		invoke crt_printf, offset rt3
+		invoke SetColor, cGreen
+		invoke crt_printf, offset rt4
+		invoke SetColor, cBlue
+		invoke crt_printf, offset rt5
+		invoke SetColor, LightCyan
+		invoke crt_printf, offset rt6
+		invoke SetColor, cMagenta
+		invoke crt_printf, offset rt7
 		invoke crt_printf, offset szDClearLine
 	.elseif isReturn == 1
 		invoke SetColor, LightGray
@@ -1062,6 +1131,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				.elseif isCircle == 1
 					invoke DrawCross , hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 					mov isCircle, 0
+				.elseif isRainbow == 1
+					invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+					invoke DrawCell2, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 				.else
 					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
 				.endif
@@ -1522,6 +1594,43 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov byte ptr[szToDraw], MBrush
 				.endif
 				mov isCircle, 1
+				mov isEraser, 0
+				mov isPicker, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
+
+			; RAINBOW
+			.elseif ax >= 18 && ax <= 25 && bx >= WORKING_AREA_HEIGHT+8 && bx < WORKING_AREA_HEIGHT+11
+				.if isEraser == 1
+				mov byte ptr[szToDraw], MBrush
+				.endif
+				.if isRainbow == 1
+				mov isRainbow, 0
+				invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+				invoke PutCursorToPos, 18, WORKING_AREA_HEIGHT+9
+				invoke SetColor, cYellow
+				invoke crt_printf, offset szrainbowText
+				invoke crt_printf, offset szDClearLine
+				jmp SkipSetRainbow
+				.endif
+					invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+					invoke PutCursorToPos, 18, WORKING_AREA_HEIGHT+9
+					invoke SetColor, cRed
+					invoke crt_printf, offset rt1
+					invoke SetColor, LightRed
+					invoke crt_printf, offset rt2
+					invoke SetColor, cYellow
+					invoke crt_printf, offset rt3
+					invoke SetColor, cGreen
+					invoke crt_printf, offset rt4
+					invoke SetColor, cBlue
+					invoke crt_printf, offset rt5
+					invoke SetColor, LightCyan
+					invoke crt_printf, offset rt6
+					invoke SetColor, cMagenta
+					invoke crt_printf, offset rt7
+					invoke crt_printf, offset szDClearLine
+				mov isRainbow, 1
+				SkipSetRainbow:
 				mov isEraser, 0
 				mov isPicker, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick

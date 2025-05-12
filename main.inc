@@ -188,6 +188,7 @@ ReadConsoleOutputAttribute 		proto 			:DWORD, :DWORD, :DWORD, :DWORD, :DWORD
 	isPicker        db 0
 	isSquare       db 0
 	isCircle      db 0
+	isRainbow 	 db 0
 	radius db 5      ; 可自由設定圓半徑
 	strEraser		db "[Eraser]: Size %d ", 0
 	fmtBrushStatus db  " [brush]: Size %d", 0
