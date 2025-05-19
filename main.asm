@@ -235,8 +235,8 @@ copyback:
 
     mov writeRegion.Left, 1
     mov writeRegion.Top, 3
-    mov writeRegion.Right, HISTORY_WIDTH + 2
-    mov writeRegion.Bottom, HISTORY_HEIGHT + 4
+    mov writeRegion.Right, HISTORY_WIDTH + 1
+    mov writeRegion.Bottom, HISTORY_HEIGHT + 1
 
     ; 寫入畫面
     invoke WriteConsoleOutput, hConsoleOutput, addr tempBuffer, DWORD PTR bufferSize, DWORD PTR bufferCoord, addr writeRegion
@@ -282,64 +282,392 @@ DrawCell proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 	Ret
 DrawCell endp
 
- DrawSquare proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
+.data
+currentColor DWORD 0
 
-	LOCAL localCoord: DWORD
+.code
+DrawCell2 proc uses ebx ecx esi edi hOut: DWORD, dwCoord: DWORD
 
-	; 設定顏色
-	invoke SetColor, dword ptr[drawColor]
+    ; 使用目前的顏色
+    mov eax, currentColor
+    invoke SetColor, eax
 
-	; 取得中心點座標 → 推算左上角的起始點
-	mov eax, dwCoord
-	mov ecx, eax
-	and ecx, 0FFFFh       ; ECX = X
-	mov edx, eax
-	shr edx, 16           ; EDX = Y
+    ; 準備畫筆緩衝區
+    lea esi, szBrushBuffer
+    mov ebx, 0
+    mov cx, word ptr[dwCoord]
 
-	sub ecx, 2            ; X - 2
-	sub edx, 2            ; Y - 2
+    ; 畫出橫向的字符
+    .while ebx < drawSize && cx <= WORKING_AREA_WIDTH
+        mov al, byte ptr[szToDraw]
+        mov byte ptr[esi], al
+        inc ebx
+        inc esi
+        inc cx
+    .endw
+    mov byte ptr[esi], 0
 
-	shl edx, 16
-	or ecx, edx           ; 將 Y<<16 | X 組合成 DWORD
-	mov localCoord, ecx   ; 存入起始座標
+    ; 垂直列印緩衝區
+    mov ebx, 0
+    mov cx, word ptr[dwCoord+2]
+    .while ebx < drawSize && cx <= WORKING_AREA_HEIGHT
+        push ecx
+        invoke SetConsoleCursorPosition, hOut, dwCoord
+        invoke crt_printf, offset szBrushBuffer
+        pop ecx
+
+        inc ebx
+        inc cx
+        add dwCoord, 65536
+    .endw
+
+    ; 更新顏色（輪替）
+    mov eax, currentColor
+    inc eax
+    cmp eax, 15
+    jl  SkipResetColor
+    xor eax, eax  ; 重設為 0
+
+SkipResetColor:
+    mov currentColor, eax
+
+    ret
+DrawCell2 endp
 
 
-	; ===================
-	; 橫向輸出一列字元
-	; ===================
+DrawSquare proc uses ebx ecx edx esi edi,
+    hOut: DWORD, dwCoord: DWORD
 
-	lea esi, szBrushBuffer
-	mov ebx, 0
+    LOCAL startX: WORD
+    LOCAL startY: WORD
+    LOCAL squareWidth: DWORD
+    LOCAL squareHeight: DWORD
+    LOCAL curCoord: DWORD
 
-	mov ecx, 0  ; 為了記錄 cx 寬度邊界比較
+    ; 邊界常數
+    LOCAL regLeft: DWORD
+    LOCAL regRight: DWORD
+    LOCAL regTop: DWORD
+    LOCAL regBottom: DWORD
 
-.while ebx < 5 && ecx < WORKING_AREA_WIDTH
-	mov al, byte ptr[szToDraw]
-	mov byte ptr[esi], al
-	inc ebx
-	inc esi
-	inc ecx
-.endw
+    ;=======================
+    ; 設定邊界範圍
+    ;=======================
+    mov regLeft, 1
+    mov regTop, 3
+    mov regRight, HISTORY_WIDTH + 1
+    mov regBottom, HISTORY_HEIGHT + 1
 
-	
+    ;=======================
+    ; 計算方形寬高
+    ;=======================
+    movzx eax, byte ptr [drawSize]
+    mov ecx, eax
+    shl eax, 1                 ; 寬 = drawSize * 2
+    mov squareWidth, eax
+    mov squareHeight, ecx     ; 高 = drawSize
 
-	; ====================
-	; 垂直列印多行字元列
-	; ====================
+    ;=======================
+    ; 拆解 dwCoord（左上角）
+    ;=======================
+    mov eax, dwCoord
+    mov ecx, eax
+    and ecx, 0FFFFh            ; ECX = X
+    mov edx, eax
+    shr edx, 16                ; EDX = Y
 
-	mov ebx, 0
-	mov eax, localCoord
+    mov word ptr [startX], cx
+    mov word ptr [startY], dx
 
-.while ebx < 5
-	invoke SetConsoleCursorPosition, hOut, eax
-	invoke crt_printf, offset szBrushBuffer
+    ;=======================
+    ; 設定顏色
+    ;=======================
+    invoke SetColor, dword ptr [drawColor]
 
-	add eax, 65536    ; Y++
-	inc ebx
-.endw
+    ;=======================
+    ; 畫 上邊 & 下邊
+    ;=======================
+    mov ebx, 0
+draw_horizontal:
+    ; -------- 上邊 --------
+    movzx edx, word ptr [startY]
+    movzx ecx, word ptr [startX]
+    add ecx, ebx
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_top
+    cmp ecx, regRight
+    jnb skip_top
+    cmp edx, regTop
+    jb skip_top
+    cmp edx, regBottom
+    jnb skip_top
 
-	ret
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+skip_top:
+
+    ; -------- 下邊 --------
+    movzx edx, word ptr [startY]
+    add edx, squareHeight
+    dec edx                      ; bottom Y
+    movzx ecx, word ptr [startX]
+    add ecx, ebx
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_bottom
+    cmp ecx, regRight
+    jnb skip_bottom
+    cmp edx, regTop
+    jb skip_bottom
+    cmp edx, regBottom
+    jnb skip_bottom
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+skip_bottom:
+
+    inc ebx
+    cmp ebx, squareWidth
+    jl draw_horizontal
+
+    ;=======================
+    ; 畫 左邊 & 右邊
+    ;=======================
+    mov ebx, 1 ; 不重畫上下邊
+draw_vertical:
+    ; -------- 左邊 --------
+    movzx edx, word ptr [startY]
+    add edx, ebx
+    movzx ecx, word ptr [startX]
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_left
+    cmp ecx, regRight
+    jnb skip_left
+    cmp edx, regTop
+    jb skip_left
+    cmp edx, regBottom
+    jnb skip_left
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+skip_left:
+
+    ; -------- 右邊 --------
+    movzx edx, word ptr [startY]
+    add edx, ebx
+    movzx ecx, word ptr [startX]
+    add ecx, squareWidth
+    dec ecx
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jb skip_right
+    cmp ecx, regRight
+    jnb skip_right
+    cmp edx, regTop
+    jb skip_right
+    cmp edx, regBottom
+    jnb skip_right
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+skip_right:
+
+    inc ebx
+    cmp ebx, squareHeight
+    jl draw_vertical
+
+    ret
 DrawSquare endp
+
+DrawCross proc uses ebx ecx edx esi edi,
+    hOut: DWORD, dwCoord: DWORD
+
+    LOCAL centerX: WORD
+    LOCAL centerY: WORD
+    LOCAL drawRadius: DWORD
+
+    ; 邊界常數
+    LOCAL regLeft: DWORD
+    LOCAL regRight: DWORD
+    LOCAL regTop: DWORD
+    LOCAL regBottom: DWORD
+
+    ;=======================
+    ; 計算畫十字的範圍
+    ;=======================
+    movzx eax, byte ptr [drawSize]  ; drawSize 是半徑
+    mov drawRadius, eax
+
+    ;=======================
+    ; 拆解 dwCoord（中心點）
+    ;=======================
+    mov eax, dwCoord
+    mov ecx, eax
+    and ecx, 0FFFFh                 ; ECX = X
+    mov edx, eax
+    shr edx, 16                     ; EDX = Y
+
+    mov word ptr [centerX], cx
+    mov word ptr [centerY], dx
+
+    ;=======================
+    ; 設定邊界範圍
+    ;=======================
+    mov regLeft, 1
+    mov regTop, 3
+    mov eax, HISTORY_WIDTH
+    mov regRight, eax
+    mov eax, HISTORY_HEIGHT
+    mov regBottom, eax
+
+    ;=======================
+    ; 設定顏色
+    ;=======================
+    invoke SetColor, dword ptr [drawColor]
+
+    ;=======================
+    ; 畫橫線（右）
+    ;=======================
+    mov ebx, -1
+    neg ebx
+draw_horizontal:
+    movzx edx, word ptr [centerY]     ; Y
+    movzx ecx, word ptr [centerX]
+    add ecx, ebx                      ; X = centerX + offset
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_h1
+    cmp ecx, regRight
+    jg skip_h1
+    cmp edx, regTop
+    jl skip_h1
+    cmp edx, regBottom
+    jg skip_h1
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+skip_h1:
+    inc ebx
+    cmp ebx, drawRadius
+    jle draw_horizontal
+
+    ;=======================
+    ; 畫直線（下）
+    ;=======================
+    mov ebx, -1
+    neg ebx
+draw_vertical:
+    movzx edx, word ptr [centerY]
+    add edx, ebx                     ; Y = centerY + offset
+    movzx ecx, word ptr [centerX]   ; X
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_v1
+    cmp ecx, regRight
+    jg skip_v1
+    cmp edx, regTop
+    jl skip_v1
+    cmp edx, regBottom
+    jg skip_v1
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+skip_v1:
+    inc ebx
+    cmp ebx, drawRadius
+    jle draw_vertical
+
+    ;=======================
+    ; 畫橫線（左）
+    ;=======================
+    mov ebx, 0
+draw_horizontal2:
+    movzx edx, word ptr [centerY]     ; Y
+    movzx ecx, word ptr [centerX]
+    sub ecx, drawRadius
+    add ecx, ebx                      ; X = centerX - radius + offset
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_h2
+    cmp ecx, regRight
+    jg skip_h2
+    cmp edx, regTop
+    jl skip_h2
+    cmp edx, regBottom
+    jg skip_h2
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+skip_h2:
+    inc ebx
+    cmp ebx, drawRadius
+    jl draw_horizontal2
+
+    ;=======================
+    ; 畫直線（上）
+    ;=======================
+    mov ebx, 0
+draw_vertical2:
+    movzx edx, word ptr [centerY]
+    sub edx, drawRadius
+    add edx, ebx                     ; Y = centerY - radius + offset
+    movzx ecx, word ptr [centerX]   ; X
+
+    ; 邊界檢查
+    cmp ecx, regLeft
+    jl skip_v2
+    cmp ecx, regRight
+    jg skip_v2
+    cmp edx, regTop
+    jl skip_v2
+    cmp edx, regBottom
+    jg skip_v2
+
+    mov eax, edx
+    shl eax, 16
+    or eax, ecx
+    invoke SetConsoleCursorPosition, hOut, eax
+    invoke crt_printf, offset szToDraw
+
+skip_v2:
+    inc ebx
+    cmp ebx, drawRadius
+    jl draw_vertical2
+
+    ret
+DrawCross endp
+
+
+
 
 ShowBrushStatus proc uses eax ebx ecx edx
 
@@ -365,8 +693,33 @@ ShowBrushStatus proc uses eax ebx ecx edx
 	.elseif isPicker == 1
         invoke SetColor, LightGray
         invoke crt_printf, offset szPickerButtonText
+
+	.elseif isSquare == 1
+        invoke SetColor, LightGray
+        invoke crt_printf, offset szSquareButtonText
+		invoke crt_printf, offset szDClearLine
+	.elseif isCircle == 1
+		invoke SetColor, LightGray
+		invoke crt_printf, offset szCircleButtonText
+		invoke crt_printf, offset szDClearLine
+	.elseif isRainbow == 1
+		invoke SetColor, cRed
+		invoke crt_printf, offset rt1
+		invoke SetColor, LightRed
+		invoke crt_printf, offset rt2
+		invoke SetColor, cYellow
+		invoke crt_printf, offset rt3
+		invoke SetColor, cGreen
+		invoke crt_printf, offset rt4
+		invoke SetColor, cBlue
+		invoke crt_printf, offset rt5
+		invoke SetColor, LightCyan
+		invoke crt_printf, offset rt6
+		invoke SetColor, cMagenta
+		invoke crt_printf, offset rt7
+		invoke crt_printf, offset szDClearLine
 	.elseif isReturn == 1
-		   invoke SetColor, LightGray
+		invoke SetColor, LightGray
         invoke crt_printf, offset strReturn
     .else
         ; 顏色的brush
@@ -731,6 +1084,9 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov isPicker, 1
 				mov isEraser, 0
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			.elseif al == 'Q' || al == 'q'
+				invoke ExitProcess, 0
+
 		.endif
 				invoke ShowBrushStatus
 				mov isReturn, 0
@@ -769,8 +1125,18 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 						mov prevButtonState, 1
 						invoke SaveToHistory
 					.endif
+				.if isSquare == 1
+					invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+					mov isSquare, 0
+				.elseif isCircle == 1
+					invoke DrawCross , hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+					mov isCircle, 0
+				.elseif isRainbow == 1
+					invoke SetConsoleTextAttribute, hOut, interfaceBorderColor
+					invoke DrawCell2, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.else
 					invoke DrawCell, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
-				;invoke DrawSquare, hOut, dword ptr[ConsoleRecord.MouseEvent.dwMousePosition]
+				.endif
 				.endif
 			.endif
 		
@@ -1210,7 +1576,64 @@ KeyController proc uses ebx ecx esi edi hIn: DWORD, hOut: DWORD
 				mov isEraser, 0
 
 				invoke PlaySoundOnClick, offset szPlayOnClick
+			; SQUARE
 
+			.elseif ax >= 2 && ax <= 8 && bx >= WORKING_AREA_HEIGHT+8 && bx < WORKING_AREA_HEIGHT+11
+				.if isEraser == 1
+				mov byte ptr[szToDraw], MBrush
+				.endif
+				mov isSquare, 1
+				mov isEraser, 0
+				mov isPicker, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
+
+			; CIRCLE
+
+			.elseif ax >= 10 && ax <= 16 && bx >= WORKING_AREA_HEIGHT+8 && bx < WORKING_AREA_HEIGHT+11
+				.if isEraser == 1
+				mov byte ptr[szToDraw], MBrush
+				.endif
+				mov isCircle, 1
+				mov isEraser, 0
+				mov isPicker, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
+
+			; RAINBOW
+			.elseif ax >= 18 && ax <= 25 && bx >= WORKING_AREA_HEIGHT+8 && bx < WORKING_AREA_HEIGHT+11
+				.if isEraser == 1
+				mov byte ptr[szToDraw], MBrush
+				.endif
+				.if isRainbow == 1
+				mov isRainbow, 0
+				invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+				invoke PutCursorToPos, 18, WORKING_AREA_HEIGHT+9
+				invoke SetColor, cYellow
+				invoke crt_printf, offset szrainbowText
+				invoke crt_printf, offset szDClearLine
+				jmp SkipSetRainbow
+				.endif
+					invoke SetConsoleTextAttribute, hOut, interfaceFontColor
+					invoke PutCursorToPos, 18, WORKING_AREA_HEIGHT+9
+					invoke SetColor, cRed
+					invoke crt_printf, offset rt1
+					invoke SetColor, LightRed
+					invoke crt_printf, offset rt2
+					invoke SetColor, cYellow
+					invoke crt_printf, offset rt3
+					invoke SetColor, cGreen
+					invoke crt_printf, offset rt4
+					invoke SetColor, cBlue
+					invoke crt_printf, offset rt5
+					invoke SetColor, LightCyan
+					invoke crt_printf, offset rt6
+					invoke SetColor, cMagenta
+					invoke crt_printf, offset rt7
+					invoke crt_printf, offset szDClearLine
+				mov isRainbow, 1
+				SkipSetRainbow:
+				mov isEraser, 0
+				mov isPicker, 0
+				invoke PlaySoundOnClick, offset szPlayOnClick
 			.endif
 				 ; 儲存本次狀態供下次比對
     			mov prevButtonState, 0
